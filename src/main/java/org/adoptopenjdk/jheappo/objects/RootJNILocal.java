@@ -1,4 +1,4 @@
-package com.kodewerk.jheappo.objects;
+package org.adoptopenjdk.jheappo.objects;
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -6,7 +6,7 @@ package com.kodewerk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import com.kodewerk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
 public class RootJNILocal extends HeapData {
 

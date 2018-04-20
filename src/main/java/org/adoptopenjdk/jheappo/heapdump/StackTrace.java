@@ -1,4 +1,4 @@
-package com.kodewerk.jheappo.heapdump;
+package org.adoptopenjdk.jheappo.heapdump;
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -7,7 +7,7 @@ package com.kodewerk.jheappo.heapdump;
  */
 
 
-import com.kodewerk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
 public class StackTrace extends HeapDumpBuffer {
 

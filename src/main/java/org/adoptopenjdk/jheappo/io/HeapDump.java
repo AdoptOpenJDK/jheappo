@@ -1,4 +1,4 @@
-package com.kodewerk.jheappo.io;
+package org.adoptopenjdk.jheappo.io;
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -6,11 +6,8 @@ package com.kodewerk.jheappo.io;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import com.kodewerk.jheappo.heapdump.*;
-import com.kodewerk.jheappo.heapdump.EndThread;
-import com.kodewerk.jheappo.heapdump.HeapDumpSegment;
-import com.kodewerk.jheappo.heapdump.HeapSummary;
-import com.kodewerk.jheappo.heapdump.StartThread;
+
+import org.adoptopenjdk.jheappo.heapdump.*;
 
 import java.io.*;
 import java.nio.file.Path;

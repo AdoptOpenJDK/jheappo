@@ -1,4 +1,4 @@
-package com.kodewerk.jheappo.heapdump;
+package org.adoptopenjdk.jheappo.heapdump;
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -7,11 +7,7 @@ package com.kodewerk.jheappo.heapdump;
  */
 
 
-import com.kodewerk.jheappo.io.HeapDumpBuffer;
-
-public class StackFrame extends HeapDumpBuffer {
-
-    public final static int TAG = 0x04;
+import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
     /*
         ID    | stack frame ID
@@ -25,6 +21,10 @@ public class StackFrame extends HeapDumpBuffer {
               |  -2  | compiled method (Not implemented)
               |  -3  | native method (Not implemented)
      */
+
+public class StackFrame extends HeapDumpBuffer {
+
+    public final static int TAG = 0x04;
 
     long stackFrameID;
     long methodNameStringID;

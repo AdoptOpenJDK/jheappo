@@ -1,4 +1,4 @@
-package com.kodewerk.jheappo.io;
+package org.adoptopenjdk.jheappo.io;
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
