@@ -1,3 +1,10 @@
+# OSX files
+*DS_Store
+
+#IDE
+.idea/*
+*.iml
+
 # Compiled class file
 *.class
 
