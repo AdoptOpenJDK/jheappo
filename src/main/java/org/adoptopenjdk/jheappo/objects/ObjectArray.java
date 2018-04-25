@@ -16,20 +16,21 @@ u4 number of elements
 ID array class object ID
 [ID]* elements
  */
-public class ObjectArray extends HeapData {
+public class ObjectArray extends HeapObject {
 
-    private long objectID;
+    public static final int TAG = 0x22;
+
     private int stackTraceSerialNumber;
     private int size;
     private long elementsObjectID;
     private byte[] elements;
 
     public ObjectArray(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();
         //todo: extract array
-        System.out.println("Object Array size " + size);
+        //System.out.println("Object Array size " + size);
         elementsObjectID = buffer.extractID();
         elements = buffer.read(size * 8);
     }

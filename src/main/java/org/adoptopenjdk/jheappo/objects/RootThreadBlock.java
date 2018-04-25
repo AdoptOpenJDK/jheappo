@@ -8,15 +8,18 @@ package org.adoptopenjdk.jheappo.objects;
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
-public class RootThreadBlock extends HeapData {
+public class RootThreadBlock extends HeapObject {
 
     public final static int TAG = 0x06;
 
-    private long objectID;
-    private long threadSerialNumber;
+    private int threadSerialNumber;
 
     public RootThreadBlock(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super( buffer);
         threadSerialNumber = buffer.extractU4();
+    }
+
+    public String toString() {
+        return "Root Sticky Class : " + getId() + " : " + threadSerialNumber;
     }
 }

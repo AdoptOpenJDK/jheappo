@@ -8,15 +8,14 @@ package org.adoptopenjdk.jheappo.objects;
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
-public class RootNativeStack extends HeapData {
+public class RootNativeStack extends HeapObject {
 
     public final static int TAG = 0x04;
 
-    private long objectID;
-    private long threadSerialNumber;
+    private int threadSerialNumber;
 
     public RootNativeStack(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super(buffer);
         threadSerialNumber = buffer.extractU4();
     }
 }

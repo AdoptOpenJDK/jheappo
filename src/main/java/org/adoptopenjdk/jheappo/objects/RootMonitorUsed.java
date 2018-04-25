@@ -8,13 +8,11 @@ package org.adoptopenjdk.jheappo.objects;
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
-public class RootMonitorUsed extends HeapData {
+public class RootMonitorUsed extends HeapObject {
 
     public final static int TAG = 0x07;
 
-    private long objectID;
-
     public RootMonitorUsed(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super(buffer);
     }
 }

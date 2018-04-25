@@ -8,16 +8,15 @@ package org.adoptopenjdk.jheappo.objects;
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
-public class RootJNILocal extends HeapData {
+public class RootJNILocal extends HeapObject {
 
     public final static int TAG = 0x02;
 
-    private long objectID;
-    private long threadSerialNumber;
-    private long frameNumberInStackTrace; // -1 if empty
+    private int threadSerialNumber;
+    private int frameNumberInStackTrace; // -1 if empty
 
     public RootJNILocal(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super(buffer);
         threadSerialNumber = buffer.extractU4();
         frameNumberInStackTrace = buffer.extractU4();
     }

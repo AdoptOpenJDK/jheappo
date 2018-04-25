@@ -9,13 +9,16 @@ package org.adoptopenjdk.jheappo.objects;
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 
-public class RootUnknown extends HeapData {
+public class RootUnknown extends HeapObject {
 
     public final static int TAG = 0xFF;
 
-    long objectID;
-
     public RootUnknown(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super(buffer);
+    }
+
+    @Override
+    public String toString() {
+        return "Root Unknown : " + getId();
     }
 }

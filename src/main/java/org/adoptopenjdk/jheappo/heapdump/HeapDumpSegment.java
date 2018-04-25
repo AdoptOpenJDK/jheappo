@@ -105,9 +105,9 @@ public class HeapDumpSegment extends HeapDumpBuffer {
         super(body);
     }
 
-    public HeapData next() {
+    public HeapObject next() {
 
-        HeapData element = null;
+        HeapObject element = null;
         int typeCode = super.extractU1();
         switch (typeCode) {
             case RootUnknown.TAG:
@@ -143,10 +143,10 @@ public class HeapDumpSegment extends HeapDumpBuffer {
             case InstanceObject.TAG:
                 element = new InstanceObject(this);
                 return element;
-            case 0x22:
+            case ObjectArray.TAG:
                 element = new ObjectArray(this);
                 return element;
-            case 0x23:
+            case PrimitiveArray.TAG:
                 element = new PrimitiveArray(this);
                 return element;
             default:

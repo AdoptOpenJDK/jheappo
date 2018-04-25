@@ -7,8 +7,7 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
-
-import java.util.ArrayList;
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
         0x20    | ID      | class object ID
@@ -44,11 +43,10 @@ import java.util.ArrayList;
         11  | long
  */
 
-public class ClassObject extends HeapData {
+public class ClassObject extends HeapObject {
 
     public static final int TAG = 0x20;
 
-    long classObjectID;
     int stackTraceSerialNumber;
     long superClassObjectID;
     long classLoaderObjectID;
@@ -57,14 +55,15 @@ public class ClassObject extends HeapData {
     long[] reserved = new long[2];
     int instanceSizeInBytes;
 
-    int constantPoolSizeInBytes = 0;
+    long[] fieldNames;
+    int[] fieldTypes;
 
     public ClassObject(HeapDumpBuffer buffer) {
+        super(buffer); //classObjectID;
         extractPoolData( buffer);
     }
 
     private void extractPoolData( HeapDumpBuffer buffer) {
-        classObjectID = buffer.extractID();
         stackTraceSerialNumber = buffer.extractU4();
         superClassObjectID = buffer.extractID();
         classLoaderObjectID = buffer.extractID();
@@ -89,9 +88,11 @@ public class ClassObject extends HeapData {
         for ( int i = 0; i < numberOfRecords; i++) {
             int constantPoolIndex = buffer.extractU2();
             int basicType = buffer.extractU1();
-            extractBasicType(basicType, buffer);
-            System.out.println( "Constant Pool: " + constantPoolIndex + ":" + PRIMITIVE_TYPES[basicType]);
+            BasicDataTypeValue value = extractBasicType(basicType, buffer);
+            System.out.println( "Constant Pool: " + constantPoolIndex + ":" + BasicDataTypes.fromInt(basicType).getName() + "=" + value.toString());
         }
+        if (numberOfRecords > 0)
+            System.out.println("---");
     }
 
     /*
@@ -105,8 +106,9 @@ public class ClassObject extends HeapData {
         for (int i = 0; i < numberOfRecords; i++) {
             long staticFieldNameStringID = buffer.extractID();
             int basicType = buffer.extractU1();
-            extractBasicType(basicType, buffer);
-            System.out.println( "Static Fields: " + staticFieldNameStringID + ":" + PRIMITIVE_TYPES[basicType]);
+            BasicDataTypeValue value = extractBasicType(basicType, buffer);
+            //todo: put value into a representation of the class object.
+            //System.out.println( "Static Fields: " + staticFieldNameStringID + ":" + BasicDataTypes.fromInt(basicType).getName() + "=" + value.toString());
         }
     }
 
@@ -117,70 +119,24 @@ public class ClassObject extends HeapData {
      */
     private void extractInstanceFields( HeapDumpBuffer buffer) {
         int numberOfInstanceFields = buffer.extractU2();
-        for (int i = 0; i < numberOfInstanceFields; i++) {
-            long instanceFieldNameStringID = buffer.extractID();
-            if ( instanceFieldNameStringID < 1)
-                System.out.println("error: " + instanceFieldNameStringID);
-            int basicType = buffer.extractU1();
-            System.out.println( "Instance Fields: " + instanceFieldNameStringID + ":" + PRIMITIVE_TYPES[basicType]);
+        if ( numberOfInstanceFields > -1) {
+            fieldNames = new long[numberOfInstanceFields];
+            fieldTypes = new int[numberOfInstanceFields];
         }
-    }
-
-    private void extractBasicType(int basicType, HeapDumpBuffer buffer) {
-
-        switch (basicType) {
-            case BOOLEAN : {
-                boolean value = buffer.extractBoolean();
-                System.out.println("boolean : " + value);
-            }
-            break;
-            case CHAR : {
-                char value = buffer.extractChar();
-                System.out.println("char : " + value);
-            }
-            break;
-            case BYTE : {
-                byte value = buffer.extractByte();
-                System.out.println("byte : " + value);
-            }
-            break;
-            case SHORT: {
-                short value = buffer.extractShort();
-                System.out.println("short : " + value);
-            }
-            break;
-            case FLOAT : {
-                float value = buffer.extractFloat();
-                System.out.println("float : " + value);
-            }
-            break;
-            case INT : {
-                int value = buffer.extractInt();
-                System.out.println("int : " + value);
-            }
-            break;
-            case OBJECT : {
-                long value = buffer.extractID();
-                System.out.println("Object : " + value);
-            }
-            break;
-            case DOUBLE : {
-                double value = buffer.extractDouble();
-                System.out.println("double : " + value);
-            }
-            break;
-            case LONG: {
-                long value = buffer.extractLong();
-                System.out.println("long : " + value);
-            }
-            break;
-            default:
-                System.out.println("primitive types[" + basicType + "] = unknown basic type");
-
+        for (int i = 0; i < numberOfInstanceFields; i++) {
+            fieldNames[i] = buffer.extractID();
+            if ( fieldNames[i] < 1)
+                System.out.println("field name invalid id: " + fieldNames[i]);
+            fieldTypes[i] = buffer.extractU1();
+            //System.out.println( "Instance Fields: " + instanceFieldNameStringID + ":" + BasicDataTypes.fromInt(basicType).getName());
         }
     }
 
     public String toString() {
-        return "Class Object: " + classObjectID;
+        return "Class Object: " + getId();
+    }
+
+    public int[] fieldTypes() {
+        return fieldTypes;
     }
 }

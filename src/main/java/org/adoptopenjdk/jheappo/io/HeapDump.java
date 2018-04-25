@@ -18,81 +18,71 @@ public class HeapDump {
     private Path path;
     private DataInputStream input;
     private HeapDumpHeader header;
+    private boolean heapDumpEnd;
 
     public HeapDump(Path path) {
         this.path = path;
     }
 
-    public void stream() throws IOException {
+    public void open() throws IOException {
         try {
             input = new DataInputStream(new BufferedInputStream(new FileInputStream(path.toFile())));
-            readHeader(input);
-            System.out.println("Header: " + header.toString());
-            while (input.available() > 0)
-                readRecord(input);
+            heapDumpEnd = false;
         }
         catch (FileNotFoundException ex){
             System.out.println(ex.toString());
         }
     }
 
-    private void readHeader(DataInputStream heapDump) throws IOException {
+    public HeapDumpHeader readHeader() throws IOException {
         header = new HeapDumpHeader();
-        header.extract( heapDump);
-    }
-
-    private void readRecord(DataInputStream heapDump) throws IOException {
-        HeapDumpBuffer record = extract(heapDump);
-        System.out.println("Heap Dump Record: " + record.toString());
-        if ( record instanceof StackFrame) return;
-        if ( record instanceof StackTrace) return;
-        if ( record instanceof UTF8String) return;
-        if ( record instanceof LoadClass) return;
-        if ( record instanceof HeapDumpSegment) {
-            record.dump(System.out);
-        }
+        header.extract( input);
+        return header;
     }
 
     private byte[] readBody(DataInputStream inputStream, int bufferLength) throws IOException {
         byte[] buffer = new byte[bufferLength];
         int bytesRead = inputStream.read(buffer);
-        if ( bytesRead < bufferLength)
+        if ( bytesRead < bufferLength) {
+            heapDumpEnd = true;
             throw new IOException("bytes request exceeded bytes read");
+        }
         return buffer;
     }
 
-    public HeapDumpBuffer extract(DataInputStream buffer) throws IOException {
-        short tag = (short)buffer.readByte();
-        long timeStamp = buffer.readInt();
-        int bodySize = buffer.readInt();
+    public HeapDumpBuffer extract() throws IOException {
+        short tag = (short)input.readByte();
+        long timeStamp = input.readInt();
+        int bodySize = input.readInt();
         switch (tag) {
-            case UTF8String.TAG :
-                return new UTF8String(readBody(buffer, bodySize));
+            case UTF8StringSegment.TAG :
+                return new UTF8StringSegment(readBody(input, bodySize));
             case LoadClass.TAG:
-                return new LoadClass(readBody(buffer, bodySize));
+                return new LoadClass(readBody(input, bodySize));
             case UnloadClass.TAG:
-                return new UnloadClass(readBody(buffer, bodySize));
+                return new UnloadClass(readBody(input, bodySize));
             case StackFrame.TAG:
-                return new StackFrame(readBody(buffer, bodySize));
+                return new StackFrame(readBody(input, bodySize));
             case StackTrace.TAG:
-                return new StackTrace(readBody(buffer, bodySize));
+                return new StackTrace(readBody(input, bodySize));
             case AllocSites.TAG:
-                return new AllocSites(readBody(buffer, bodySize));
+                return new AllocSites(readBody(input, bodySize));
             case HeapSummary.TAG:
-                return new HeapSummary(readBody(buffer, bodySize));
+                return new HeapSummary(readBody(input, bodySize));
             case StartThread.TAG:
-                return new StartThread(readBody(buffer, bodySize));
+                return new StartThread(readBody(input, bodySize));
             case EndThread.TAG:
-                return new EndThread(readBody(buffer, bodySize));
+                return new EndThread(readBody(input, bodySize));
             case HeapDumpSegment.TAG1:
             case HeapDumpSegment.TAG2:
-                return new HeapDumpSegment(readBody(buffer, bodySize));
+                return new HeapDumpSegment(readBody(input, bodySize));
             case HeapDumpEnd.TAG:
-                return new HeapDumpEnd(readBody(buffer, bodySize));
+                heapDumpEnd = true;
+                return new HeapDumpEnd(readBody(input, bodySize));
             case CPUSamples.TAG:
-                return new CPUSamples(readBody(buffer, bodySize));
+                return new CPUSamples(readBody(input, bodySize));
             case ControlSettings.TAG:
-                return new ControlSettings(readBody(buffer, bodySize));
+                return new ControlSettings(readBody(input, bodySize));
             default :
                 throw new IOException("Unknown record type + " + tag);
         }
@@ -101,5 +91,9 @@ public class HeapDump {
     @Override
     public String toString() {
         return path.toString();
+    }
+
+    public boolean isAtHeapDumpEnd() throws IOException {
+        return heapDumpEnd || input.available() == 0;
     }
 }

@@ -7,6 +7,8 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
+import org.adoptopenjdk.jheappo.model.JavaHeap;
 
 /*
 ID object ID
@@ -15,22 +17,43 @@ ID class object ID
 u4 number of bytes that follow
 [value]*  instance field values (this class, followed by super class, etc)
  */
-public class InstanceObject extends HeapData {
+public class InstanceObject extends HeapObject {
 
     public final static int TAG = 0x21;
 
-    private long objectID;
-    private long stackTraceSerialNumber;
+    private int stackTraceSerialNumber;
     private long classObjectID;
-    private byte[] instanceFieldValues;
+    private BasicDataTypeValue[] instanceFieldValues;
+    private HeapDumpBuffer buffer;
+    private int bufferLength;
 
     public InstanceObject(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+        super(buffer);
+        this.buffer = buffer;
         stackTraceSerialNumber = buffer.extractU4();
         classObjectID = buffer.extractID();
-        int bufferLength = (int)buffer.extractU4();
-        if ( bufferLength > 0)
-            instanceFieldValues = buffer.read(bufferLength);
+        bufferLength = buffer.extractU4();
+    }
 
+    public void inflate(JavaHeap javaHeap) {
+        if (bufferLength > 0) {
+            ClassObject co = javaHeap.getClazzById(classObjectID);
+            int[] fieldTypes = co.fieldTypes();
+            instanceFieldValues = new BasicDataTypeValue[fieldTypes.length];
+            for (int i = 0; i < fieldTypes.length; i++) {
+                instanceFieldValues[i] = extractBasicType(fieldTypes[i], buffer);
+            }
+            buffer = null;
+        } else {
+            instanceFieldValues = new BasicDataTypeValue[0];
+        }
+    }
+
+    public String toString() {
+        String prefix = "InstanceObject->" + classObjectID;
+        for( int i = 0; i < instanceFieldValues.length; i++) {
+            prefix += ":" + instanceFieldValues[i].toString();
+        }
+        return prefix;
     }
 }

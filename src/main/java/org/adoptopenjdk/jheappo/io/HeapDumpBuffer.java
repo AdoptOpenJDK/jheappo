@@ -23,7 +23,7 @@ public abstract class HeapDumpBuffer {
     }
 
     public boolean endOfBuffer() {
-        return getBody().length == index;
+        return getBody().length <= index;
     }
 
     public long extractU8() {
@@ -117,5 +117,9 @@ public abstract class HeapDumpBuffer {
 
     public void skip(int skipOver) {
         index += skipOver;
+    }
+
+    public byte[] readRemaining() {
+        return read( body.length - index);
     }
 }
