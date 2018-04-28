@@ -33,6 +33,7 @@ public class InstanceObject extends HeapObject {
         stackTraceSerialNumber = buffer.extractU4();
         classObjectID = buffer.extractID();
         bufferLength = buffer.extractU4();
+        buffer.skip(bufferLength);
     }
 
     public void inflate(JavaHeap javaHeap) {
