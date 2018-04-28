@@ -10,11 +10,6 @@ import java.io.PrintStream;
 
 public abstract class HeapDumpBuffer {
 
-    private static final int U1 = 1;
-    private static final int U2 = 2;
-    private static final int U4 = 4;
-    private static final int ID = 8;
-
     private byte[] body;
     private int index = 0;
 
@@ -22,47 +17,46 @@ public abstract class HeapDumpBuffer {
         this.body = body;
     }
 
+    public int getIndex() { return index; }
+
     public boolean endOfBuffer() {
         return getBody().length <= index;
     }
 
-    public long extractU8() {
-        long value = 0;
-        for ( int i = index; i < index + 8; i++) {
-            value = (value << 8) | (body[i] & 0xff);
+    private int read() {
+        return body[index++] & 0xff;
+    }
+
+    public byte extractU1() {
+        return (byte)read();
+    }
+
+    public short extractU2() {
+        int value = extractU1();
+        for (int cursor = 1; cursor < 2; cursor++) {
+            value = (value << 8) | (short)read();
         }
-        index += 8;
-        return value;
+        return (short)value;
     }
 
     public int extractU4() {
-        int value = 0;
-        for ( int i = index; i < index + 4; i++) {
-            value = (value << 8) | (body[i] & 0xff);
+        int value = extractU1();
+        for (int cursor = 1; cursor < 4; cursor++) {
+            value = (value << 8) | read();
         }
-        index += 4;
         return value;
     }
 
-    public int extractU2() {
-        int value = 0;
-        for ( int i = index; i < index + 2; i++) {
-            value = (value << 8) | (body[i] & 0xff);
+    public long extractU8() {
+        long value = extractU1();
+        for (int cursor = 1; cursor < 8; cursor++) {
+            value = (value << 8) | (long)read();
         }
-        index += 2;
         return value;
-    }
-
-    public int extractU1() {
-        return body[index++] & 0xff;
     }
 
     public long extractID() {
         return extractU8();
-    }
-
-    public void dump(PrintStream out) {
-        out.println(body); //todo make this all abstract
     }
 
     protected byte[] getBody() {
@@ -70,19 +64,19 @@ public abstract class HeapDumpBuffer {
     }
 
     public boolean extractBoolean() {
-        return body[index++] != 0;
+        return extractU1() != 0;
     }
 
     public char extractChar() {
-        return (char)(((body[index++] & 0xff) <<8) | (body[index++] & 0xff));
+        return (char)extractU2();
     }
 
     public byte extractByte() {
-        return (byte)(body[index++] & 0xff);
+        return (byte)extractU1();
     }
 
     public short extractShort() {
-        return (short)((body[index++]<<8) | (body[index++] & 0xff));
+        return (short)extractU2();
     }
 
     public float extractFloat() {
@@ -90,10 +84,7 @@ public abstract class HeapDumpBuffer {
     }
 
     public int extractInt() {
-        int value = 0;
-        for ( int pos = 0; pos < 4; pos++)
-            value = (value << 8) | ((body[index++] & 0xff));
-        return value;
+        return extractU4();
     }
 
     public double extractDouble() {
@@ -101,10 +92,7 @@ public abstract class HeapDumpBuffer {
     }
 
     public long extractLong() {
-        long value = 0;
-        for ( int pos = 0; pos < 8; pos++)
-            value = (value << 8) |  (long)(body[index++] & 0xff) ;
-        return value;
+        return extractU8();
     }
 
     public byte[] read(int bufferLength) {
@@ -121,5 +109,19 @@ public abstract class HeapDumpBuffer {
 
     public byte[] readRemaining() {
         return read( body.length - index);
+    }
+
+    public void dump(PrintStream out) {
+        int max = (body.length > 1000) ? 1000 : body.length;
+        for( int cursor = 0; cursor < max; cursor++) {
+            System.out.print(Integer.toHexString(body[cursor] & 255));
+            System.out.print( " ");
+        }
+        out.println("");
+        for( int cursor = 0; cursor < max; cursor++) {
+            System.out.print((char)(body[cursor] & 255));
+            System.out.print( " ");
+        }
+        out.println("");
     }
 }

@@ -23,7 +23,7 @@ public class InstanceObject extends HeapObject {
 
     private int stackTraceSerialNumber;
     private long classObjectID;
-    private BasicDataTypeValue[] instanceFieldValues;
+    private BasicDataTypeValue[] instanceFieldValues = new BasicDataTypeValue[0];
     private HeapDumpBuffer buffer;
     private int bufferLength;
 
@@ -36,6 +36,7 @@ public class InstanceObject extends HeapObject {
     }
 
     public void inflate(JavaHeap javaHeap) {
+        return; /*
         if (bufferLength > 0) {
             ClassObject co = javaHeap.getClazzById(classObjectID);
             int[] fieldTypes = co.fieldTypes();
@@ -44,9 +45,7 @@ public class InstanceObject extends HeapObject {
                 instanceFieldValues[i] = extractBasicType(fieldTypes[i], buffer);
             }
             buffer = null;
-        } else {
-            instanceFieldValues = new BasicDataTypeValue[0];
-        }
+        } */
     }
 
     public String toString() {

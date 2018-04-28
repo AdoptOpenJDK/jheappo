@@ -60,28 +60,37 @@ public class HeapDump {
             case LoadClass.TAG:
                 return new LoadClass(readBody(input, bodySize));
             case UnloadClass.TAG:
+                System.out.println("UnloadClass");
                 return new UnloadClass(readBody(input, bodySize));
             case StackFrame.TAG:
                 return new StackFrame(readBody(input, bodySize));
             case StackTrace.TAG:
                 return new StackTrace(readBody(input, bodySize));
             case AllocSites.TAG:
+                System.out.println("AllocSites");
                 return new AllocSites(readBody(input, bodySize));
             case HeapSummary.TAG:
+                System.out.println("HeapSummary");
                 return new HeapSummary(readBody(input, bodySize));
             case StartThread.TAG:
+                System.out.println("StartThread");
                 return new StartThread(readBody(input, bodySize));
             case EndThread.TAG:
+                System.out.println("EndThread");
                 return new EndThread(readBody(input, bodySize));
             case HeapDumpSegment.TAG1:
             case HeapDumpSegment.TAG2:
+                System.out.println("HeapDumpSegment");
                 return new HeapDumpSegment(readBody(input, bodySize));
             case HeapDumpEnd.TAG:
+                System.out.println("HeapDumpEnd");
                 heapDumpEnd = true;
                 return new HeapDumpEnd(readBody(input, bodySize));
             case CPUSamples.TAG:
+                System.out.println("CPUSamples");
                 return new CPUSamples(readBody(input, bodySize));
             case ControlSettings.TAG:
+                System.out.println("ControlSettings");
                 return new ControlSettings(readBody(input, bodySize));
             default :
                 throw new IOException("Unknown record type + " + tag);

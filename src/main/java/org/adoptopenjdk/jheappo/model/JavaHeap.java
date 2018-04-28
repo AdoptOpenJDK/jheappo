@@ -37,11 +37,15 @@ public class JavaHeap {
             else if (frame instanceof HeapDumpSegment) {
                 while (!frame.endOfBuffer()) {
                     HeapObject heapObject = ((HeapDumpSegment) frame).next();
+                    if ( heapObject == null) {
+                        System.out.println("parser error resolving type in HeapDumpSegment....");
+                        continue;
+                    }
                     if (heapObject instanceof ClassObject) {
                         clazzTable.put(heapObject.getId(), (ClassObject) heapObject);
+                        long[] fieldNameIndexes = ((ClassObject)heapObject).fieldNameIndicies();
                     } else if (heapObject instanceof InstanceObject) {
                         ((InstanceObject) heapObject).inflate(this);
-                        System.out.println(heapObject.toString());
                         oopTable.put(heapObject.getId(),(InstanceObject)heapObject);
                     } else if (heapObject instanceof RootJNIGlobal) {
                     } else if (heapObject instanceof PrimitiveArray) {

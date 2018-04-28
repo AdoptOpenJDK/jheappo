@@ -55,7 +55,10 @@ public class ClassObject extends HeapObject {
     long[] reserved = new long[2];
     int instanceSizeInBytes;
 
-    long[] fieldNames;
+    long[] staticFieldNameIndicies;
+    BasicDataTypeValue[] staticValues;
+
+    long[] fieldNamesIndicies;
     int[] fieldTypes;
 
     public ClassObject(HeapDumpBuffer buffer) {
@@ -64,6 +67,8 @@ public class ClassObject extends HeapObject {
     }
 
     private void extractPoolData( HeapDumpBuffer buffer) {
+        if ( buffer.getIndex() > 265000)
+            System.out.println("here @" + buffer.getIndex());
         stackTraceSerialNumber = buffer.extractU4();
         superClassObjectID = buffer.extractID();
         classLoaderObjectID = buffer.extractID();
@@ -91,8 +96,6 @@ public class ClassObject extends HeapObject {
             BasicDataTypeValue value = extractBasicType(basicType, buffer);
             System.out.println( "Constant Pool: " + constantPoolIndex + ":" + BasicDataTypes.fromInt(basicType).getName() + "=" + value.toString());
         }
-        if (numberOfRecords > 0)
-            System.out.println("---");
     }
 
     /*
@@ -103,12 +106,13 @@ public class ClassObject extends HeapObject {
      */
     private void extractStaticFields( HeapDumpBuffer buffer) {
         int numberOfRecords = buffer.extractU2();
+        staticFieldNameIndicies = new long[numberOfRecords];
+        staticValues = new BasicDataTypeValue[numberOfRecords];
+
         for (int i = 0; i < numberOfRecords; i++) {
-            long staticFieldNameStringID = buffer.extractID();
+            staticFieldNameIndicies[i] = buffer.extractID();
             int basicType = buffer.extractU1();
-            BasicDataTypeValue value = extractBasicType(basicType, buffer);
-            //todo: put value into a representation of the class object.
-            //System.out.println( "Static Fields: " + staticFieldNameStringID + ":" + BasicDataTypes.fromInt(basicType).getName() + "=" + value.toString());
+            staticValues[i] = extractBasicType(basicType, buffer);
         }
     }
 
@@ -120,15 +124,14 @@ public class ClassObject extends HeapObject {
     private void extractInstanceFields( HeapDumpBuffer buffer) {
         int numberOfInstanceFields = buffer.extractU2();
         if ( numberOfInstanceFields > -1) {
-            fieldNames = new long[numberOfInstanceFields];
+            fieldNamesIndicies = new long[numberOfInstanceFields];
             fieldTypes = new int[numberOfInstanceFields];
         }
         for (int i = 0; i < numberOfInstanceFields; i++) {
-            fieldNames[i] = buffer.extractID();
-            if ( fieldNames[i] < 1)
-                System.out.println("field name invalid id: " + fieldNames[i]);
+            fieldNamesIndicies[i] = buffer.extractID();
+            if ( fieldNamesIndicies[i] < 1)
+                System.out.println("field name invalid id: " + fieldNamesIndicies[i]);
             fieldTypes[i] = buffer.extractU1();
-            //System.out.println( "Instance Fields: " + instanceFieldNameStringID + ":" + BasicDataTypes.fromInt(basicType).getName());
         }
     }
 
@@ -138,5 +141,9 @@ public class ClassObject extends HeapObject {
 
     public int[] fieldTypes() {
         return fieldTypes;
+    }
+
+    public long[] fieldNameIndicies() {
+        return fieldNamesIndicies;
     }
 }

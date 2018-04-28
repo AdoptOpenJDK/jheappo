@@ -10,6 +10,9 @@ package org.adoptopenjdk.jheappo.heapdump;
 import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
 import org.adoptopenjdk.jheappo.objects.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 public class HeapDumpSegment extends HeapDumpBuffer {
@@ -150,14 +153,8 @@ public class HeapDumpSegment extends HeapDumpBuffer {
                 element = new PrimitiveArray(this);
                 return element;
             default:
-                System.out.println(typeCode + " not recognized...");
+                System.out.println(typeCode + " not recognized... @index=" + super.getIndex());
                 return null;
-        }
-    }
-
-    public void dump(PrintStream out) {
-        while ( ! endOfBuffer()) {
-            System.out.println(next().toString());
         }
     }
 }
