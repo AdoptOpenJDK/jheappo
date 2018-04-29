@@ -111,8 +111,6 @@ public class HeapDumpSegment extends HeapDumpBuffer {
     public HeapObject next() {
 
         HeapObject element = null;
-        if ( getIndex() == 265450)
-            System.out.println("stop here");
         int typeCode = super.extractU1();
         switch (typeCode) {
             case RootUnknown.TAG:
@@ -143,7 +141,6 @@ public class HeapDumpSegment extends HeapDumpBuffer {
                 element = new RootThreadObject(this);
                 return element;
             case ClassObject.TAG:
-                System.out.println("index=" + getIndex());
                 element = new ClassObject(this);
                 return element;
             case InstanceObject.TAG:

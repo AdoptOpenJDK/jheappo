@@ -12,6 +12,6 @@ public class BasicDataTypeValue {
     }
 
     public String toString() {
-        return "Basic Type value: " + value + " of type " + type.toString();
+        return value + " of type " + type.toString();
     }
 }

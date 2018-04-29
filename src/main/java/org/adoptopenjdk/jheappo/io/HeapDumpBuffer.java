@@ -8,7 +8,7 @@ package org.adoptopenjdk.jheappo.io;
 
 import java.io.PrintStream;
 
-public abstract class HeapDumpBuffer {
+public class HeapDumpBuffer {
 
     private byte[] body;
     private int index = 0;

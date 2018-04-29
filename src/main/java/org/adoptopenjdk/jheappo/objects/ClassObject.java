@@ -67,8 +67,6 @@ public class ClassObject extends HeapObject {
     }
 
     private void extractPoolData( HeapDumpBuffer buffer) {
-        if ( buffer.getIndex() > 265000)
-            System.out.println("here @" + buffer.getIndex());
         stackTraceSerialNumber = buffer.extractU4();
         superClassObjectID = buffer.extractID();
         classLoaderObjectID = buffer.extractID();
@@ -136,7 +134,18 @@ public class ClassObject extends HeapObject {
     }
 
     public String toString() {
-        return "Class Object: " + getId();
+        String fields = ", Fields --> ";
+        for ( int i = 0; i < fieldNamesIndicies.length; i++) {
+            fields += ", " + fieldNamesIndicies[i];
+        }
+
+        return "Class Object -->" + getId() +
+                ", stackTraceSerialNumber -->" + stackTraceSerialNumber +
+                ", superClassObjectID -->" + superClassObjectID +
+                ", classLoaderObjectID -->" + classLoaderObjectID +
+                ", signersObjectID -->" + signersObjectID +
+                ", protectionDomainObjectID -->" + protectionDomainObjectID +
+                fields;
     }
 
     public int[] fieldTypes() {

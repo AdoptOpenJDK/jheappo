@@ -25,34 +25,35 @@ public class InstanceObject extends HeapObject {
     private long classObjectID;
     private BasicDataTypeValue[] instanceFieldValues = new BasicDataTypeValue[0];
     private HeapDumpBuffer buffer;
-    private int bufferLength;
 
     public InstanceObject(HeapDumpBuffer buffer) {
         super(buffer);
         this.buffer = buffer;
         stackTraceSerialNumber = buffer.extractU4();
         classObjectID = buffer.extractID();
-        bufferLength = buffer.extractU4();
-        buffer.skip(bufferLength);
+        int bufferLength = buffer.extractU4();
+        this.buffer = new HeapDumpBuffer(buffer.read(bufferLength));
     }
 
     public void inflate(JavaHeap javaHeap) {
-        return; /*
-        if (bufferLength > 0) {
+        if ( buffer == null) return;
+        if (! buffer.endOfBuffer()) {
             ClassObject co = javaHeap.getClazzById(classObjectID);
             int[] fieldTypes = co.fieldTypes();
             instanceFieldValues = new BasicDataTypeValue[fieldTypes.length];
             for (int i = 0; i < fieldTypes.length; i++) {
                 instanceFieldValues[i] = extractBasicType(fieldTypes[i], buffer);
             }
-            buffer = null;
-        } */
+        }
+        buffer = null;
     }
 
     public String toString() {
         String prefix = "InstanceObject->" + classObjectID;
+        if ( instanceFieldValues.length > 0)
+            prefix += " fields --> ";
         for( int i = 0; i < instanceFieldValues.length; i++) {
-            prefix += ":" + instanceFieldValues[i].toString();
+            prefix += instanceFieldValues[i].toString() + ", ";
         }
         return prefix;
     }
