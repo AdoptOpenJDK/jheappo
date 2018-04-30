@@ -29,8 +29,6 @@ public class ObjectArray extends HeapObject {
         super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();
-        //todo: extract array
-        //System.out.println("Object Array size " + size);
         elementsObjectID = buffer.extractID();
         elements = buffer.read(size * 8);
     }

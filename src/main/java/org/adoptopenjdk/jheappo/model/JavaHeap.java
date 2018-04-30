@@ -17,6 +17,7 @@ public class JavaHeap {
     HashMap<Long,UTF8String> stringTable = new HashMap<>();
     HashMap<Long,ClassObject> clazzTable = new HashMap<>();
     HashMap<Long,InstanceObject> oopTable = new HashMap<>();
+    HashMap<Long,LoadClass> loadClassTable = new HashMap<>();
 
     public JavaHeap() {}
 
@@ -24,6 +25,7 @@ public class JavaHeap {
         BufferedWriter out = new BufferedWriter(new FileWriter("string.table"));
         BufferedWriter clazzFile = new BufferedWriter(new FileWriter("class.table"));
         BufferedWriter instanceFile = new BufferedWriter(new FileWriter("instance.table"));
+        BufferedWriter loadClassFile = new BufferedWriter(new FileWriter("loadClass.table"));
         heapDump.open();
         HeapDumpHeader header = heapDump.readHeader();
         System.out.println("Header: " + header.toString());
@@ -39,6 +41,8 @@ public class JavaHeap {
                 out.write(Long.toString(string.getId()) + "->" + string.getString() + "\n");
             }
             else if (frame instanceof LoadClass) {
+                loadClassTable.put(((LoadClass)frame).getClassObjectID(),(LoadClass)frame); //store mapping of class to class name.
+                out.write(frame.toString() + "\n");
             }
             else if (frame instanceof HeapDumpSegment) {
                 while (!frame.endOfBuffer()) {
@@ -76,6 +80,7 @@ public class JavaHeap {
         out.close();
         clazzFile.close();
         instanceFile.close();
+        loadClassFile.close();
     }
 
     public ClassObject getClazzById(long cid) {

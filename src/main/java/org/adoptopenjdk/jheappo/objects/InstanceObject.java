@@ -42,7 +42,7 @@ public class InstanceObject extends HeapObject {
             int[] fieldTypes = co.fieldTypes();
             instanceFieldValues = new BasicDataTypeValue[fieldTypes.length];
             for (int i = 0; i < fieldTypes.length; i++) {
-                instanceFieldValues[i] = extractBasicType(fieldTypes[i], buffer);
+                instanceFieldValues[i] = buffer.extractBasicType(fieldTypes[i]);
             }
         }
         buffer = null;

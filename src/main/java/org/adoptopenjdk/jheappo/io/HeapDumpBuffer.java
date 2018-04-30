@@ -6,6 +6,9 @@ package org.adoptopenjdk.jheappo.io;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
+import org.adoptopenjdk.jheappo.objects.BasicDataTypes;
+
 import java.io.PrintStream;
 
 public class HeapDumpBuffer {
@@ -123,5 +126,31 @@ public class HeapDumpBuffer {
             System.out.print( " ");
         }
         out.println("");
+    }
+
+    public BasicDataTypeValue extractBasicType(int basicType) {
+
+        switch (BasicDataTypes.fromInt(basicType)) {
+            case BOOLEAN :
+                return new BasicDataTypeValue(this.extractBoolean(),BasicDataTypes.BOOLEAN);
+            case CHAR :
+                return new BasicDataTypeValue(this.extractChar(),BasicDataTypes.CHAR);
+            case BYTE :
+                return new BasicDataTypeValue(this.extractByte(),BasicDataTypes.BYTE);
+            case SHORT:
+                return new BasicDataTypeValue(this.extractShort(),BasicDataTypes.SHORT);
+            case FLOAT :
+                return new BasicDataTypeValue(this.extractFloat(),BasicDataTypes.FLOAT);
+            case INT :
+                return new BasicDataTypeValue(this.extractInt(),BasicDataTypes.INT);
+            case OBJECT :
+                return new BasicDataTypeValue(this.extractID(),BasicDataTypes.OBJECT);
+            case DOUBLE :
+                return new BasicDataTypeValue(this.extractDouble(),BasicDataTypes.DOUBLE);
+            case LONG:
+                return new BasicDataTypeValue(this.extractLong(),BasicDataTypes.LONG);
+            default:
+                return new BasicDataTypeValue(null,BasicDataTypes.UNKNOWN);
+        }
     }
 }

@@ -90,9 +90,8 @@ public class ClassObject extends HeapObject {
         int numberOfRecords = buffer.extractU2();
         for ( int i = 0; i < numberOfRecords; i++) {
             int constantPoolIndex = buffer.extractU2();
-            int basicType = buffer.extractU1();
-            BasicDataTypeValue value = extractBasicType(basicType, buffer);
-            System.out.println( "Constant Pool: " + constantPoolIndex + ":" + BasicDataTypes.fromInt(basicType).getName() + "=" + value.toString());
+            BasicDataTypeValue value = buffer.extractBasicType(buffer.extractU1());
+            System.out.println( "Constant Pool: " + constantPoolIndex + ":" + value.toString());
         }
     }
 
@@ -109,8 +108,7 @@ public class ClassObject extends HeapObject {
 
         for (int i = 0; i < numberOfRecords; i++) {
             staticFieldNameIndicies[i] = buffer.extractID();
-            int basicType = buffer.extractU1();
-            staticValues[i] = extractBasicType(basicType, buffer);
+            staticValues[i] = buffer.extractBasicType(buffer.extractU1());
         }
     }
 

@@ -33,6 +33,8 @@ public class LoadClass extends HeapDumpBuffer {
         classNameStringID = super.extractID();
     }
 
+    public long getClassObjectID() { return classObjectID; }
+
     public String toString() {
         return "Loaded -> " + classSerialNumber + ":" + classObjectID + ":" + stackTraceSerialNumber + ":" + classNameStringID;
     }
