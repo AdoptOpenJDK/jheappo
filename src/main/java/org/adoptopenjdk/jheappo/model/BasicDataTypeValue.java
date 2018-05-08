@@ -11,6 +11,14 @@ public class BasicDataTypeValue {
         this.type = type;
     }
 
+    public BasicDataTypes getType() {
+        return type;
+    }
+
+    public Object getValue() {
+        return this.value;
+    }
+
     public String toString() {
         return value + " of type " + type.toString();
     }

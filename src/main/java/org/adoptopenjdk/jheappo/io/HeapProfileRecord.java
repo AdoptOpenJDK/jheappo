@@ -107,9 +107,9 @@ public class HeapProfileRecord {
         return extractU8();
     }
 
-    public BasicDataTypeValue extractBasicType(int basicType) {
+    public BasicDataTypeValue extractBasicType(BasicDataTypes basicType) {
 
-        switch (BasicDataTypes.fromInt(basicType)) {
+        switch (basicType) {
             case BOOLEAN :
                 return new BasicDataTypeValue(this.extractBoolean(),BasicDataTypes.BOOLEAN);
             case CHAR :
@@ -131,6 +131,10 @@ public class HeapProfileRecord {
             default:
                 return new BasicDataTypeValue(null,BasicDataTypes.UNKNOWN);
         }
+    }
+
+    public BasicDataTypeValue extractBasicType(int basicType) {
+        return extractBasicType(BasicDataTypes.fromInt(basicType));
     }
 
     /*

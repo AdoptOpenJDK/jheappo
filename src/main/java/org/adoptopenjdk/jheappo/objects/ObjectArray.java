@@ -8,6 +8,7 @@ package org.adoptopenjdk.jheappo.objects;
 
 
 import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
 ID array object ID
@@ -23,13 +24,32 @@ public class ObjectArray extends HeapObject {
     private int stackTraceSerialNumber;
     private int size;
     private long elementsObjectID;
-    private byte[] elements;
+    private BasicDataTypeValue[] elements;
 
     public ObjectArray(HeapProfileRecord buffer) {
         super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();
         elementsObjectID = buffer.extractID();
-        elements = buffer.read(size * 8);
+        elements = new BasicDataTypeValue[size];
+        for ( int i = 0; i < size; i++) {
+            elements[i] = buffer.extractBasicType(BasicDataTypes.OBJECT);
+        }
+    }
+
+    public int getStackTraceSerialNumber() {
+        return stackTraceSerialNumber;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public long getElementsObjectID() {
+        return elementsObjectID;
+    }
+
+    public long getValueObjectIDAt(int index) {
+        return ((Long)elements[index].getValue()).longValue();
     }
 }
