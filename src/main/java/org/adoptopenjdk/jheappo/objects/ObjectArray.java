@@ -7,7 +7,8 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
 ID array object ID
@@ -16,21 +17,39 @@ u4 number of elements
 ID array class object ID
 [ID]* elements
  */
-public class ObjectArray extends HeapData {
+public class ObjectArray extends HeapObject {
 
-    private long objectID;
+    public static final int TAG = 0x22;
+
     private int stackTraceSerialNumber;
     private int size;
     private long elementsObjectID;
-    private byte[] elements;
+    private BasicDataTypeValue[] elements;
 
-    public ObjectArray(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+    public ObjectArray(HeapProfileRecord buffer) {
+        super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();
-        //todo: extract array
-        System.out.println("Object Array size " + size);
         elementsObjectID = buffer.extractID();
-        elements = buffer.read(size * 8);
+        elements = new BasicDataTypeValue[size];
+        for ( int i = 0; i < size; i++) {
+            elements[i] = buffer.extractBasicType(BasicDataTypes.OBJECT);
+        }
+    }
+
+    public int getStackTraceSerialNumber() {
+        return stackTraceSerialNumber;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public long getElementsObjectID() {
+        return elementsObjectID;
+    }
+
+    public long getValueObjectIDAt(int index) {
+        return ((Long)elements[index].getValue()).longValue();
     }
 }

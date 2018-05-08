@@ -6,33 +6,37 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 
-public class PrimitiveArray extends HeapData {
+public class PrimitiveArray extends HeapObject {
 
-    private long objectID;
+    public static final int TAG = 0x23;
+
     private int stackTraceSerialNumber;
     private int size;
     private byte elementType;
-    private byte[] elements;
     private char signature = ' ';
+    BasicDataTypeValue[] elements;
 
-    public PrimitiveArray(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+    public PrimitiveArray(HeapProfileRecord buffer) {
+        super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();
-        System.out.println("Object Array size " + size);
         elementType = buffer.extractByte();
-        elements = readArray(buffer, elementType, size);
+        readArray(buffer,elementType,size);
     }
 
-    private byte[] readArray( HeapDumpBuffer buffer, byte elementType, int size) {
-        if ( elementType < 2 || elementType > 11) {
-            System.out.println("Unknown primitive type " + elementType);
-            return new byte[0];
+    private void readArray(HeapProfileRecord buffer, byte elementType, int size) {
+        BasicDataTypes dataType = BasicDataTypes.fromInt(elementType);
+        signature = BasicDataTypes.fromInt(elementType).getMnemonic();
+        if ( dataType.equals(BasicDataTypes.UNKNOWN)) {
+            throw new IllegalArgumentException("Unknown data type : " + elementType);
         }
-        signature = SYMBOLS[elementType];
-        return buffer.read( size * TYPE_SIZES[elementType]);
+        elements = new BasicDataTypeValue[size];
+        for (int i = 0; i < size; i++) {
+            elements[i] = buffer.extractBasicType(dataType);
+        }
     }
 }

@@ -6,17 +6,16 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class RootNativeStack extends HeapData {
+public class RootNativeStack extends HeapObject {
 
     public final static int TAG = 0x04;
 
-    private long objectID;
-    private long threadSerialNumber;
+    private int threadSerialNumber;
 
-    public RootNativeStack(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+    public RootNativeStack(HeapProfileRecord buffer) {
+        super(buffer);
         threadSerialNumber = buffer.extractU4();
     }
 }

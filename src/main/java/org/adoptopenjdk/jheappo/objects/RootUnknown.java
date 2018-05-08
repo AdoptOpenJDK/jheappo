@@ -7,15 +7,18 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class RootUnknown extends HeapData {
+public class RootUnknown extends HeapObject {
 
     public final static int TAG = 0xFF;
 
-    long objectID;
+    public RootUnknown(HeapProfileRecord buffer) {
+        super(buffer);
+    }
 
-    public RootUnknown(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+    @Override
+    public String toString() {
+        return "Root Unknown : " + getId();
     }
 }

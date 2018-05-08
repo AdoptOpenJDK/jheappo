@@ -7,12 +7,10 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 import org.adoptopenjdk.jheappo.objects.*;
 
-import java.io.PrintStream;
-
-public class HeapDumpSegment extends HeapDumpBuffer {
+public class HeapDumpSegment extends HeapProfileRecord {
 
     /*
     ROOT UNKNOWN            | 0xFF  | ID      | object ID
@@ -105,9 +103,9 @@ public class HeapDumpSegment extends HeapDumpBuffer {
         super(body);
     }
 
-    public HeapData next() {
+    public HeapObject next() {
 
-        HeapData element = null;
+        HeapObject element = null;
         int typeCode = super.extractU1();
         switch (typeCode) {
             case RootUnknown.TAG:
@@ -143,21 +141,15 @@ public class HeapDumpSegment extends HeapDumpBuffer {
             case InstanceObject.TAG:
                 element = new InstanceObject(this);
                 return element;
-            case 0x22:
+            case ObjectArray.TAG:
                 element = new ObjectArray(this);
                 return element;
-            case 0x23:
+            case PrimitiveArray.TAG:
                 element = new PrimitiveArray(this);
                 return element;
             default:
-                System.out.println(typeCode + " not recognized...");
+                System.out.println(typeCode + " not recognized... @index=" + super.getIndex());
                 return null;
-        }
-    }
-
-    public void dump(PrintStream out) {
-        while ( ! endOfBuffer()) {
-            System.out.println(next().toString());
         }
     }
 }

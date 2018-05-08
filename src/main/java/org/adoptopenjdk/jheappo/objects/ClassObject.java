@@ -6,9 +6,8 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
-
-import java.util.ArrayList;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
         0x20    | ID      | class object ID
@@ -44,11 +43,10 @@ import java.util.ArrayList;
         11  | long
  */
 
-public class ClassObject extends HeapData {
+public class ClassObject extends HeapObject {
 
     public static final int TAG = 0x20;
 
-    long classObjectID;
     int stackTraceSerialNumber;
     long superClassObjectID;
     long classLoaderObjectID;
@@ -57,14 +55,18 @@ public class ClassObject extends HeapData {
     long[] reserved = new long[2];
     int instanceSizeInBytes;
 
-    int constantPoolSizeInBytes = 0;
+    long[] staticFieldNameIndicies;
+    BasicDataTypeValue[] staticValues;
 
-    public ClassObject(HeapDumpBuffer buffer) {
+    long[] fieldNamesIndicies;
+    int[] fieldTypes;
+
+    public ClassObject(HeapProfileRecord buffer) {
+        super(buffer); //classObjectID;
         extractPoolData( buffer);
     }
 
-    private void extractPoolData( HeapDumpBuffer buffer) {
-        classObjectID = buffer.extractID();
+    private void extractPoolData( HeapProfileRecord buffer) {
         stackTraceSerialNumber = buffer.extractU4();
         superClassObjectID = buffer.extractID();
         classLoaderObjectID = buffer.extractID();
@@ -84,13 +86,12 @@ public class ClassObject extends HeapData {
                   | u1    | type of entry: (See Basic Type)
                   | value | value of entry (u1, u2, u4, or u8 based on type of entry)
      */
-    private void extractConstantPool( HeapDumpBuffer buffer) {
+    private void extractConstantPool( HeapProfileRecord buffer) {
         int numberOfRecords = buffer.extractU2();
         for ( int i = 0; i < numberOfRecords; i++) {
             int constantPoolIndex = buffer.extractU2();
-            int basicType = buffer.extractU1();
-            extractBasicType(basicType, buffer);
-            System.out.println( "Constant Pool: " + constantPoolIndex + ":" + PRIMITIVE_TYPES[basicType]);
+            BasicDataTypeValue value = buffer.extractBasicType(buffer.extractU1());
+            System.out.println( "Constant Pool: " + constantPoolIndex + ":" + value.toString());
         }
     }
 
@@ -100,13 +101,14 @@ public class ClassObject extends HeapData {
               | u1    | type of field: (See Basic Type)
               | value | value of entry (u1, u2, u4, or u8 based on type of field)
      */
-    private void extractStaticFields( HeapDumpBuffer buffer) {
+    private void extractStaticFields( HeapProfileRecord buffer) {
         int numberOfRecords = buffer.extractU2();
+        staticFieldNameIndicies = new long[numberOfRecords];
+        staticValues = new BasicDataTypeValue[numberOfRecords];
+
         for (int i = 0; i < numberOfRecords; i++) {
-            long staticFieldNameStringID = buffer.extractID();
-            int basicType = buffer.extractU1();
-            extractBasicType(basicType, buffer);
-            System.out.println( "Static Fields: " + staticFieldNameStringID + ":" + PRIMITIVE_TYPES[basicType]);
+            staticFieldNameIndicies[i] = buffer.extractID();
+            staticValues[i] = buffer.extractBasicType(buffer.extractU1());
         }
     }
 
@@ -115,72 +117,40 @@ public class ClassObject extends HeapData {
               | ID    | field name string ID
               | u1    | type of field: (See Basic Type)
      */
-    private void extractInstanceFields( HeapDumpBuffer buffer) {
+    private void extractInstanceFields( HeapProfileRecord buffer) {
         int numberOfInstanceFields = buffer.extractU2();
-        for (int i = 0; i < numberOfInstanceFields; i++) {
-            long instanceFieldNameStringID = buffer.extractID();
-            if ( instanceFieldNameStringID < 1)
-                System.out.println("error: " + instanceFieldNameStringID);
-            int basicType = buffer.extractU1();
-            System.out.println( "Instance Fields: " + instanceFieldNameStringID + ":" + PRIMITIVE_TYPES[basicType]);
+        if ( numberOfInstanceFields > -1) {
+            fieldNamesIndicies = new long[numberOfInstanceFields];
+            fieldTypes = new int[numberOfInstanceFields];
         }
-    }
-
-    private void extractBasicType(int basicType, HeapDumpBuffer buffer) {
-
-        switch (basicType) {
-            case BOOLEAN : {
-                boolean value = buffer.extractBoolean();
-                System.out.println("boolean : " + value);
-            }
-            break;
-            case CHAR : {
-                char value = buffer.extractChar();
-                System.out.println("char : " + value);
-            }
-            break;
-            case BYTE : {
-                byte value = buffer.extractByte();
-                System.out.println("byte : " + value);
-            }
-            break;
-            case SHORT: {
-                short value = buffer.extractShort();
-                System.out.println("short : " + value);
-            }
-            break;
-            case FLOAT : {
-                float value = buffer.extractFloat();
-                System.out.println("float : " + value);
-            }
-            break;
-            case INT : {
-                int value = buffer.extractInt();
-                System.out.println("int : " + value);
-            }
-            break;
-            case OBJECT : {
-                long value = buffer.extractID();
-                System.out.println("Object : " + value);
-            }
-            break;
-            case DOUBLE : {
-                double value = buffer.extractDouble();
-                System.out.println("double : " + value);
-            }
-            break;
-            case LONG: {
-                long value = buffer.extractLong();
-                System.out.println("long : " + value);
-            }
-            break;
-            default:
-                System.out.println("primitive types[" + basicType + "] = unknown basic type");
-
+        for (int i = 0; i < numberOfInstanceFields; i++) {
+            fieldNamesIndicies[i] = buffer.extractID();
+            if ( fieldNamesIndicies[i] < 1)
+                System.out.println("field name invalid id: " + fieldNamesIndicies[i]);
+            fieldTypes[i] = buffer.extractU1();
         }
     }
 
     public String toString() {
-        return "Class Object: " + classObjectID;
+        String fields = ", Fields --> ";
+        for ( int i = 0; i < fieldNamesIndicies.length; i++) {
+            fields += ", " + fieldNamesIndicies[i];
+        }
+
+        return "Class Object -->" + getId() +
+                ", stackTraceSerialNumber -->" + stackTraceSerialNumber +
+                ", superClassObjectID -->" + superClassObjectID +
+                ", classLoaderObjectID -->" + classLoaderObjectID +
+                ", signersObjectID -->" + signersObjectID +
+                ", protectionDomainObjectID -->" + protectionDomainObjectID +
+                fields;
+    }
+
+    public int[] fieldTypes() {
+        return fieldTypes;
+    }
+
+    public long[] fieldNameIndicies() {
+        return fieldNamesIndicies;
     }
 }

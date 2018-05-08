@@ -6,17 +6,20 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class RootThreadBlock extends HeapData {
+public class RootThreadBlock extends HeapObject {
 
     public final static int TAG = 0x06;
 
-    private long objectID;
-    private long threadSerialNumber;
+    private int threadSerialNumber;
 
-    public RootThreadBlock(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+    public RootThreadBlock(HeapProfileRecord buffer) {
+        super( buffer);
         threadSerialNumber = buffer.extractU4();
+    }
+
+    public String toString() {
+        return "Root Sticky Class : " + getId() + " : " + threadSerialNumber;
     }
 }

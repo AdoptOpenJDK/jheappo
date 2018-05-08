@@ -6,18 +6,17 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class RootJavaFrame extends HeapData {
+public class RootJavaFrame extends HeapObject {
 
     public final static int TAG = 0x03;
 
-    private long objectID;
-    private long threadSerialNumber;
-    private long frameNumberInStackTrace; // -1 if empty
+    private int threadSerialNumber;
+    private int frameNumberInStackTrace; // -1 if empty
 
-    public RootJavaFrame(HeapDumpBuffer buffer) {
-        objectID = buffer.extractID();
+    public RootJavaFrame(HeapProfileRecord buffer) {
+        super(buffer);
         threadSerialNumber = buffer.extractU4();
         frameNumberInStackTrace = buffer.extractU4();
     }
