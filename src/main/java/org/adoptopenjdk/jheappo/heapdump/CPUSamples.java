@@ -7,9 +7,9 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class CPUSamples extends HeapDumpBuffer {
+public class CPUSamples extends HeapProfileRecord {
 
     public final static int TAG = 0x0D;
 

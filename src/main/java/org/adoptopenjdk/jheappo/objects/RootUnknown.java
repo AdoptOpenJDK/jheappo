@@ -7,13 +7,13 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
 public class RootUnknown extends HeapObject {
 
     public final static int TAG = 0xFF;
 
-    public RootUnknown(HeapDumpBuffer buffer) {
+    public RootUnknown(HeapProfileRecord buffer) {
         super(buffer);
     }
 

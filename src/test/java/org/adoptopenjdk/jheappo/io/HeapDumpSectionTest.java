@@ -5,12 +5,12 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class HeapDumpBufferTest {
+public class HeapDumpSectionTest {
 
     @Test
     public void testBufferReading() {
         byte[] one = { 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 10, 10, 10, 10 };
-        SimpleBuffer buffer = new SimpleBuffer(one);
+        SimpleRecord buffer = new SimpleRecord(one);
         assertEquals("", 0, buffer.extractU1());
         assertEquals("", 0, buffer.extractU2());
         assertEquals("", 16777216, buffer.extractU4());
@@ -18,9 +18,9 @@ public class HeapDumpBufferTest {
         assertTrue( buffer.endOfBuffer());
     }
 
-    public class SimpleBuffer extends HeapDumpBuffer {
+    public class SimpleRecord extends HeapProfileRecord {
 
-        public SimpleBuffer(byte[] buffer) {
+        public SimpleRecord(byte[] buffer) {
             super(buffer);
         }
     }

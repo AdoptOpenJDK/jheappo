@@ -9,7 +9,7 @@ package org.adoptopenjdk.jheappo.io;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public class HeapDumpHeader {
+public class HeapProfileHeader {
     private static String SUPPORTED_VERSIONS[] = { "JAVA PROFILE 1.0.1", "JAVA PROFILE 1.0.2" };
     private static int[] SUPPORTED_IDENIFIER_SIZE = { 4, 8};
 
@@ -17,7 +17,7 @@ public class HeapDumpHeader {
     private int sizeOfIdentifiers = 0;    /* u4 is unsigned 4 bytes.. which in this case is ok to assigned to signed int */
     private long millisecSinceEPOC;
 
-    HeapDumpHeader() {}
+    HeapProfileHeader() {}
 
     private String extractVersionString( DataInputStream buffer) throws IOException {
         char[] string = new char[1024];

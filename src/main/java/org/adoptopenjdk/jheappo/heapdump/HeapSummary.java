@@ -6,9 +6,9 @@ package org.adoptopenjdk.jheappo.heapdump;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class HeapSummary extends HeapDumpBuffer {
+public class HeapSummary extends HeapProfileRecord {
 
     public final static int TAG = 0x07;
 

@@ -7,9 +7,9 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class ControlSettings extends HeapDumpBuffer {
+public class ControlSettings extends HeapProfileRecord {
 
     public final static int TAG = 0x0E;
 

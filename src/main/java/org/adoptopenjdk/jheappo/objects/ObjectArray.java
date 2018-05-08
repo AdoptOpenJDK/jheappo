@@ -7,7 +7,7 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
 /*
 ID array object ID
@@ -25,7 +25,7 @@ public class ObjectArray extends HeapObject {
     private long elementsObjectID;
     private byte[] elements;
 
-    public ObjectArray(HeapDumpBuffer buffer) {
+    public ObjectArray(HeapProfileRecord buffer) {
         super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();

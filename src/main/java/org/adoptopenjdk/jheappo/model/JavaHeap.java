@@ -1,9 +1,9 @@
 package org.adoptopenjdk.jheappo.model;
 
 import org.adoptopenjdk.jheappo.heapdump.*;
-import org.adoptopenjdk.jheappo.io.HeapDump;
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
-import org.adoptopenjdk.jheappo.io.HeapDumpHeader;
+import org.adoptopenjdk.jheappo.io.HeapProfile;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.io.HeapProfileHeader;
 import org.adoptopenjdk.jheappo.objects.*;
 
 import java.io.BufferedWriter;
@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class JavaHeap {
 
@@ -18,19 +19,27 @@ public class JavaHeap {
     HashMap<Long,ClassObject> clazzTable = new HashMap<>();
     HashMap<Long,InstanceObject> oopTable = new HashMap<>();
     HashMap<Long,LoadClass> loadClassTable = new HashMap<>();
+    HashSet<Long> rootStickClass = new HashSet<>();
+    HashMap<Long,Long> rootJNIGlobal = new HashMap<>();
+    HashMap<Long,Long> rootJNILocal = new HashMap<>();
+    HashSet<Long> rootMonitorUsed = new HashSet<>();
+    HashMap<Long,RootJavaFrame> rootJavaFrame = new HashMap<>();
+    HashMap<Long,RootThreadObject> rootThreadObject = new HashMap<>();
+    HashMap<Long,PrimitiveArray> primitiveArray = new HashMap<>();
+    HashMap<Long,ObjectArray> objectArray = new HashMap<>();
 
     public JavaHeap() {}
 
-    public void populateFrom(HeapDump heapDump) throws IOException {
+    public void populateFrom(HeapProfile heapDump) throws IOException {
         BufferedWriter out = new BufferedWriter(new FileWriter("string.table"));
         BufferedWriter clazzFile = new BufferedWriter(new FileWriter("class.table"));
         BufferedWriter instanceFile = new BufferedWriter(new FileWriter("instance.table"));
         BufferedWriter loadClassFile = new BufferedWriter(new FileWriter("loadClass.table"));
         heapDump.open();
-        HeapDumpHeader header = heapDump.readHeader();
+        HeapProfileHeader header = heapDump.readHeader();
         System.out.println("Header: " + header.toString());
         while (! heapDump.isAtHeapDumpEnd()) {
-            HeapDumpBuffer frame = heapDump.extract();
+            HeapProfileRecord frame = heapDump.extract();
             if (frame instanceof StackFrame) {
             }
             else if (frame instanceof StackTrace) {
@@ -54,22 +63,35 @@ public class JavaHeap {
                     if (heapObject instanceof ClassObject) {
                         clazzTable.put(heapObject.getId(), (ClassObject) heapObject);
                         clazzFile.write(heapObject.toString() + "\n");
-                    } else if (heapObject instanceof InstanceObject) {
+                    }
+                    else if (heapObject instanceof InstanceObject) {
                         ((InstanceObject) heapObject).inflate(this);
                         oopTable.put(heapObject.getId(),(InstanceObject)heapObject);
                         instanceFile.write(heapObject.toString() + "\n");
-                    } else if (heapObject instanceof RootJNIGlobal) {
-                    } else if (heapObject instanceof PrimitiveArray) {
-                    } else if (heapObject instanceof ObjectArray) {
-                    } else if ( heapObject instanceof RootJavaFrame) {
                     }
-                    else if ( heapObject instanceof RootThreadObject) {
+                    else if (heapObject instanceof RootJNIGlobal) {
+                        rootJNIGlobal.put(heapObject.getId(),((RootJNIGlobal) heapObject).getJNIGlobalRefID());
                     }
                     else if (heapObject instanceof RootJNILocal) {
+                        rootJNILocal.put(heapObject.getId(),((RootJNILocal) heapObject).getId());
+                    }
+                    else if (heapObject instanceof PrimitiveArray) {
+                        primitiveArray.put(heapObject.getId(),(PrimitiveArray)heapObject);
+                    }
+                    else if (heapObject instanceof ObjectArray) {
+                        objectArray.put(heapObject.getId(),(ObjectArray)heapObject);
+                    }
+                    else if ( heapObject instanceof RootJavaFrame) {
+                        rootJavaFrame.put(heapObject.getId(),(RootJavaFrame) heapObject);
+                    }
+                    else if ( heapObject instanceof RootThreadObject) {
+                        rootThreadObject.put(heapObject.getId(),(RootThreadObject) heapObject);
                     }
                     else if ( heapObject instanceof RootMonitorUsed) {
+                        rootMonitorUsed.add(heapObject.getId());
                     }
                     else if (heapObject instanceof RootStickyClass) {
+                        rootStickClass.add(heapObject.getId());
                     }
                     else
                         System.out.println("missed : " + heapObject.toString());

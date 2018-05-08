@@ -12,15 +12,15 @@ import org.adoptopenjdk.jheappo.heapdump.*;
 import java.io.*;
 import java.nio.file.Path;
 
-public class HeapDump {
+public class HeapProfile {
 
 
     private Path path;
     private DataInputStream input;
-    private HeapDumpHeader header;
+    private HeapProfileHeader header;
     private boolean heapDumpEnd;
 
-    public HeapDump(Path path) {
+    public HeapProfile(Path path) {
         this.path = path;
     }
 
@@ -34,8 +34,8 @@ public class HeapDump {
         }
     }
 
-    public HeapDumpHeader readHeader() throws IOException {
-        header = new HeapDumpHeader();
+    public HeapProfileHeader readHeader() throws IOException {
+        header = new HeapProfileHeader();
         header.extract( input);
         return header;
     }
@@ -50,7 +50,7 @@ public class HeapDump {
         return buffer;
     }
 
-    public HeapDumpBuffer extract() throws IOException {
+    public HeapProfileRecord extract() throws IOException {
         short tag = (short)input.readByte();
         long timeStamp = input.readInt();
         int bodySize = input.readInt();
@@ -80,7 +80,6 @@ public class HeapDump {
                 return new EndThread(readBody(input, bodySize));
             case HeapDumpSegment.TAG1:
             case HeapDumpSegment.TAG2:
-                System.out.println("HeapDumpSegment");
                 return new HeapDumpSegment(readBody(input, bodySize));
             case HeapDumpEnd.TAG:
                 System.out.println("HeapDumpEnd");

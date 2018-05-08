@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 import org.adoptopenjdk.jheappo.model.JavaHeap;
 
@@ -24,15 +24,15 @@ public class InstanceObject extends HeapObject {
     private int stackTraceSerialNumber;
     private long classObjectID;
     private BasicDataTypeValue[] instanceFieldValues = new BasicDataTypeValue[0];
-    private HeapDumpBuffer buffer;
+    private HeapProfileRecord buffer;
 
-    public InstanceObject(HeapDumpBuffer buffer) {
+    public InstanceObject(HeapProfileRecord buffer) {
         super(buffer);
         this.buffer = buffer;
         stackTraceSerialNumber = buffer.extractU4();
         classObjectID = buffer.extractID();
         int bufferLength = buffer.extractU4();
-        this.buffer = new HeapDumpBuffer(buffer.read(bufferLength));
+        this.buffer = new HeapProfileRecord(buffer.read(bufferLength));
     }
 
     public void inflate(JavaHeap javaHeap) {

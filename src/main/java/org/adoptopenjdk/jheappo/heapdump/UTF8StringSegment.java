@@ -7,9 +7,9 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class UTF8StringSegment extends HeapDumpBuffer {
+public class UTF8StringSegment extends HeapProfileRecord {
 
     /*
         ID     | ID for this string

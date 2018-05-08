@@ -7,9 +7,9 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class LoadClass extends HeapDumpBuffer {
+public class LoadClass extends HeapProfileRecord {
 
     public final static int TAG = 0x02;
 

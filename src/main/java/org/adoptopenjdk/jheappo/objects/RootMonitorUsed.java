@@ -6,13 +6,13 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
 public class RootMonitorUsed extends HeapObject {
 
     public final static int TAG = 0x07;
 
-    public RootMonitorUsed(HeapDumpBuffer buffer) {
+    public RootMonitorUsed(HeapProfileRecord buffer) {
         super(buffer);
     }
 }

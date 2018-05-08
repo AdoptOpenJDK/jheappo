@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapDump;
+import org.adoptopenjdk.jheappo.io.HeapProfile;
 import org.adoptopenjdk.jheappo.model.JavaHeap;
 
 import java.io.File;
@@ -17,7 +17,7 @@ public class Heappo {
     public static void main(String[] args) throws IOException {
         JavaHeap heap = new JavaHeap();
         Path path = new File(args[0]).toPath();
-        HeapDump heapDump = new HeapDump(path);
+        HeapProfile heapDump = new HeapProfile(path);
         heap.populateFrom(heapDump);
         heap.writeTo(System.out);
     }

@@ -1,6 +1,6 @@
 package org.adoptopenjdk.jheappo.objects;
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
 public class HeapObject {
 
@@ -10,7 +10,7 @@ public class HeapObject {
         this.id = -1;
     }
 
-    public HeapObject(HeapDumpBuffer buffer) {
+    public HeapObject(HeapProfileRecord buffer) {
         id = buffer.extractID();
     }
 

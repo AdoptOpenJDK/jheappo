@@ -6,8 +6,13 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
+/*
+    0x08  | ID      | thread object ID
+          | u4      | thread serial number
+          | u4      | stack trace serial number
+ */
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
 public class RootThreadObject extends HeapObject {
 
@@ -16,7 +21,7 @@ public class RootThreadObject extends HeapObject {
     private int serialNumber;
     private int traceSerialNumber;
 
-    public RootThreadObject(HeapDumpBuffer buffer) {
+    public RootThreadObject(HeapProfileRecord buffer) {
         super(buffer);
         serialNumber = buffer.extractU4();
         traceSerialNumber = buffer.extractU4();

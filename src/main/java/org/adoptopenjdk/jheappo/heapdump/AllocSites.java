@@ -7,9 +7,9 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
-public class AllocSites extends HeapDumpBuffer {
+public class AllocSites extends HeapProfileRecord {
 
     public final static int TAG = 0x06;
 

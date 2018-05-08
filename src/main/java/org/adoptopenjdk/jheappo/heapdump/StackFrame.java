@@ -7,7 +7,7 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
     /*
         ID    | stack frame ID
@@ -22,7 +22,7 @@ import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
               |  -3  | native method (Not implemented)
      */
 
-public class StackFrame extends HeapDumpBuffer {
+public class StackFrame extends HeapProfileRecord {
 
     public final static int TAG = 0x04;
 

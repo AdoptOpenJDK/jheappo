@@ -7,15 +7,10 @@ package org.adoptopenjdk.jheappo.heapdump;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 import org.adoptopenjdk.jheappo.objects.*;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-
-public class HeapDumpSegment extends HeapDumpBuffer {
+public class HeapDumpSegment extends HeapProfileRecord {
 
     /*
     ROOT UNKNOWN            | 0xFF  | ID      | object ID

@@ -7,13 +7,13 @@ package org.adoptopenjdk.jheappo.objects;
  */
 
 
-import org.adoptopenjdk.jheappo.io.HeapDumpBuffer;
+import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 
 public class RootStickyClass extends HeapObject {
 
     public static final int TAG = 0x05;
 
-    public RootStickyClass(HeapDumpBuffer buffer) {
+    public RootStickyClass(HeapProfileRecord buffer) {
         super(buffer);
     }
 }
