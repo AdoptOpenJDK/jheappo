@@ -7,6 +7,7 @@ package org.adoptopenjdk.jheappo;
  */
 
 import org.adoptopenjdk.jheappo.io.HeapProfile;
+import org.adoptopenjdk.jheappo.model.HeapGraph;
 import org.adoptopenjdk.jheappo.model.JavaHeap;
 
 import java.io.File;
@@ -15,10 +16,15 @@ import java.nio.file.Path;
 
 public class Heappo {
     public static void main(String[] args) throws IOException {
-        JavaHeap heap = new JavaHeap();
         Path path = new File(args[0]).toPath();
         HeapProfile heapDump = new HeapProfile(path);
-        heap.populateFrom(heapDump);
-        heap.writeTo(System.out);
+        if (args.length > 1 && args[1].equalsIgnoreCase("graph")) {
+            HeapGraph graph = new HeapGraph(new File("graph.db"));
+            graph.populateFrom(heapDump);
+        } else {
+            JavaHeap heap = new JavaHeap();
+            heap.populateFrom(heapDump);
+            heap.writeTo(System.out);
+        }
     }
 }
