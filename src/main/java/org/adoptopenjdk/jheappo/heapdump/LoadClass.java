@@ -35,6 +35,18 @@ public class LoadClass extends HeapProfileRecord {
 
     public long getClassObjectID() { return classObjectID; }
 
+    public long classSerialNumber() {
+        return classSerialNumber;
+    }
+
+    public long stackTraceSerialNumber() {
+        return stackTraceSerialNumber;
+    }
+
+    public long classNameStringID() {
+        return classNameStringID;
+    }
+
     public String toString() {
         return "Loaded -> " + classSerialNumber + ":" + classObjectID + ":" + stackTraceSerialNumber + ":" + classNameStringID;
     }

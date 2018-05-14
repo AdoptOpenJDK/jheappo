@@ -8,7 +8,6 @@ package org.adoptopenjdk.jheappo.objects;
 
 import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
-import org.adoptopenjdk.jheappo.model.JavaHeap;
 
 /*
 ID object ID
@@ -35,11 +34,10 @@ public class InstanceObject extends HeapObject {
         this.buffer = new HeapProfileRecord(buffer.read(bufferLength));
     }
 
-    public void inflate(JavaHeap javaHeap) {
+    public void inflate(ClassObject classObject) {
         if ( buffer == null) return;
         if (! buffer.endOfBuffer()) {
-            ClassObject co = javaHeap.getClazzById(classObjectID);
-            int[] fieldTypes = co.fieldTypes();
+            int[] fieldTypes = classObject.fieldTypes();
             instanceFieldValues = new BasicDataTypeValue[fieldTypes.length];
             for (int i = 0; i < fieldTypes.length; i++) {
                 instanceFieldValues[i] = buffer.extractBasicType(fieldTypes[i]);
@@ -56,5 +54,17 @@ public class InstanceObject extends HeapObject {
             prefix += instanceFieldValues[i].toString() + ", ";
         }
         return prefix;
+    }
+
+    public int stackTraceSerialNumber() {
+        return stackTraceSerialNumber;
+    }
+
+    public long classObjectID() {
+        return classObjectID;
+    }
+
+    public BasicDataTypeValue[] instanceFieldValues() {
+        return instanceFieldValues;
     }
 }

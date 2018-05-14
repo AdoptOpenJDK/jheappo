@@ -65,8 +65,9 @@ public class JavaHeap {
                         clazzFile.write(heapObject.toString() + "\n");
                     }
                     else if (heapObject instanceof InstanceObject) {
-                        ((InstanceObject) heapObject).inflate(this);
-                        oopTable.put(heapObject.getId(),(InstanceObject)heapObject);
+                        InstanceObject instanceObject = (InstanceObject) heapObject;
+                        instanceObject.inflate(this.getClazzById(instanceObject.classObjectID()));
+                        oopTable.put(heapObject.getId(), instanceObject);
                         instanceFile.write(heapObject.toString() + "\n");
                     }
                     else if (heapObject instanceof RootJNIGlobal) {
