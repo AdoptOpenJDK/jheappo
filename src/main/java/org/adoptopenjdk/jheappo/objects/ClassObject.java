@@ -153,4 +153,20 @@ public class ClassObject extends HeapObject {
     public long[] fieldNameIndicies() {
         return fieldNamesIndicies;
     }
+
+    public long superClassObjectID() {
+        return superClassObjectID;
+    }
+
+    public int instanceSizeInBytes() {
+        return instanceSizeInBytes;
+    }
+
+    public long[] staticFieldNameIndicies() {
+        return staticFieldNameIndicies;
+    }
+
+    public BasicDataTypeValue[] staticValues() {
+        return staticValues;
+    }
 }
