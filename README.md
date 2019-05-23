@@ -6,7 +6,7 @@ A Heap Dump Parser
 
 run Heappo and add the "graph" parameter
 
-`java org.adoptopenjdk.jheappo.Heappo "/path/to/file.hprof" graph`
+`java -jar path/to/jheappo.jar "/path/to/file.hprof" graph`
 
 It will create a `graph.db` directory.
 
