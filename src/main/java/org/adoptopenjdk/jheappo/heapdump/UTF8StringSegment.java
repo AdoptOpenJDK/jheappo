@@ -18,24 +18,9 @@ public class UTF8StringSegment extends HeapProfileRecord {
 
     public final static int TAG = 0x01;
 
-//    private long id;
-//    private String string;
 
     public UTF8StringSegment(byte[] body) {
         super(body);
-//        this.id = extractID();
-//        this.string = new String(getBody()).substring(8);
     }
 
-//    public long getId() {
-//        return id;
-//    }
-
-//    public String getString() {
-//        return string;
-//    }
-
-//    public String toString() {
-//        return "UTF8_String --> " + getId() + "-->" + getString();
-//    }
 }
