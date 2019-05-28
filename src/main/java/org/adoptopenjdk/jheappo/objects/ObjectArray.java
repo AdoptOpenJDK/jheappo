@@ -6,8 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
@@ -26,7 +25,7 @@ public class ObjectArray extends HeapObject {
     private long elementsObjectID;
     private BasicDataTypeValue[] elements;
 
-    public ObjectArray(HeapProfileRecord buffer) {
+    public ObjectArray(EncodedChunk buffer) {
         super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();

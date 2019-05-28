@@ -13,7 +13,5 @@ public class EndThread extends HeapProfileRecord {
 
     public final static int TAG = 0x0B;
 
-    public EndThread(byte[] body) {
-        super(body);
-    }
+    public EndThread(EncodedChunk body) { }
 }

@@ -13,7 +13,5 @@ public class HeapDumpEnd extends HeapProfileRecord {
 
     public final static int TAG = 0x2C;
 
-    public HeapDumpEnd(byte[] body) {
-        super(body);
-    }
+    public HeapDumpEnd(EncodedChunk body) { }
 }

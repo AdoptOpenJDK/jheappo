@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 
 /*
     0x01  | ID      | object ID
@@ -18,7 +18,7 @@ public class RootJNIGlobal extends HeapObject {
 
     private long jniGlobalRefID;
 
-    public RootJNIGlobal(HeapProfileRecord buffer) {
+    public RootJNIGlobal(EncodedChunk buffer) {
         super(buffer);
         jniGlobalRefID = buffer.extractID();
     }

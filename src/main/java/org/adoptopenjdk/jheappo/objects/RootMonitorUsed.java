@@ -6,13 +6,13 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 
 public class RootMonitorUsed extends HeapObject {
 
     public final static int TAG = 0x07;
 
-    public RootMonitorUsed(HeapProfileRecord buffer) {
+    public RootMonitorUsed(EncodedChunk buffer) {
         super(buffer);
     }
 }

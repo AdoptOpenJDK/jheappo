@@ -25,12 +25,11 @@ public class LoadClass extends HeapProfileRecord {
     long stackTraceSerialNumber;
     long classNameStringID;
 
-    public LoadClass(byte[] body) {
-        super(body);
-        classSerialNumber = super.extractU4();
-        classObjectID = super.extractID();
-        stackTraceSerialNumber = super.extractU4();
-        classNameStringID = super.extractID();
+    public LoadClass(EncodedChunk body) {
+        classSerialNumber = body.extractU4();
+        classObjectID = body.extractID();
+        stackTraceSerialNumber = body.extractU4();
+        classNameStringID = body.extractID();
     }
 
     public long getClassObjectID() { return classObjectID; }

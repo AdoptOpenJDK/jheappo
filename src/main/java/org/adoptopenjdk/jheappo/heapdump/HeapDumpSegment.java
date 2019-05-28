@@ -99,56 +99,47 @@ public class HeapDumpSegment extends HeapProfileRecord {
     public final static int TAG1 = 0x0C;
     public final static int TAG2 = 0x1C;
 
-    public HeapDumpSegment(byte[] body) {
-        super(body);
+    private final EncodedChunk body;
+
+    public HeapDumpSegment(EncodedChunk body) {
+                this.body = body;
+    }
+
+    public boolean hasNext() {
+        return body.endOfBuffer();
     }
 
     public HeapObject next() {
-
-        HeapObject element = null;
-        int typeCode = super.extractU1();
+        int typeCode = body.extractU1();
         switch (typeCode) {
             case RootUnknown.TAG:
-                element =  new RootUnknown( this);
-                return element;
+                return new RootUnknown(body);
             case RootJNIGlobal.TAG:
-                element = new RootJNIGlobal(this);
-                return element;
+                return new RootJNIGlobal(body);
             case RootJNILocal.TAG:
-                element = new RootJNILocal(this);
-                return element;
+                return new RootJNILocal(body);
             case RootJavaFrame.TAG:
-                element = new RootJavaFrame(this);
-                return element;
+                return new RootJavaFrame(body);
             case RootNativeStack.TAG:
-                element = new RootNativeStack(this);
-                return element;
+                return new RootNativeStack(body);
             case RootStickyClass.TAG:
-                element = new RootStickyClass(this);
-                return element;
+                return new RootStickyClass(body);
             case RootThreadBlock.TAG:
-                element = new RootThreadBlock(this);
-                return element;
+                return new RootThreadBlock(body);
             case RootMonitorUsed.TAG:
-                element = new RootMonitorUsed(this);
-                return element;
+                return new RootMonitorUsed(body);
             case RootThreadObject.TAG:
-                element = new RootThreadObject(this);
-                return element;
+                return new RootThreadObject(body);
             case ClassObject.TAG:
-                element = new ClassObject(this);
-                return element;
+                return new ClassObject(body);
             case InstanceObject.TAG:
-                element = new InstanceObject(this);
-                return element;
+                return new InstanceObject(body);
             case ObjectArray.TAG:
-                element = new ObjectArray(this);
-                return element;
+                return new ObjectArray(body);
             case PrimitiveArray.TAG:
-                element = new PrimitiveArray(this);
-                return element;
+                return new PrimitiveArray(body);
             default:
-                System.out.println(typeCode + " not recognized... @index=" + super.getIndex());
+                System.out.println(typeCode + " not recognized... @index=" + body.getIndex());
                 return null;
         }
     }

@@ -13,7 +13,5 @@ public class ControlSettings extends HeapProfileRecord {
 
     public final static int TAG = 0x0E;
 
-    public ControlSettings(byte[] body) {
-        super(body);
-    }
+    public ControlSettings(EncodedChunk body) { }
 }

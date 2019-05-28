@@ -12,7 +12,7 @@ package org.adoptopenjdk.jheappo.objects;
           | u4      | stack trace serial number
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 
 public class RootThreadObject extends HeapObject {
 
@@ -21,7 +21,7 @@ public class RootThreadObject extends HeapObject {
     private int serialNumber;
     private int traceSerialNumber;
 
-    public RootThreadObject(HeapProfileRecord buffer) {
+    public RootThreadObject(EncodedChunk buffer) {
         super(buffer);
         serialNumber = buffer.extractU4();
         traceSerialNumber = buffer.extractU4();

@@ -40,14 +40,14 @@ public class HeapProfile {
         return header;
     }
 
-    private byte[] readBody(DataInputStream inputStream, int bufferLength) throws IOException {
+    private EncodedChunk readBody(DataInputStream inputStream, int bufferLength) throws IOException {
         byte[] buffer = new byte[bufferLength];
         int bytesRead = inputStream.read(buffer);
         if ( bytesRead < bufferLength) {
             heapDumpEnd = true;
             throw new IOException("bytes request exceeded bytes read");
         }
-        return buffer;
+        return new EncodedChunk(buffer);
     }
 
     public HeapProfileRecord extract() throws IOException {

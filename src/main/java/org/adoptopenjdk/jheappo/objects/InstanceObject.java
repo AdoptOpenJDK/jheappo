@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
@@ -23,15 +23,15 @@ public class InstanceObject extends HeapObject {
     private int stackTraceSerialNumber;
     private long classObjectID;
     private BasicDataTypeValue[] instanceFieldValues = new BasicDataTypeValue[0];
-    private HeapProfileRecord buffer;
+    private EncodedChunk buffer;
 
-    public InstanceObject(HeapProfileRecord buffer) {
+    public InstanceObject(EncodedChunk buffer) {
         super(buffer);
         this.buffer = buffer;
         stackTraceSerialNumber = buffer.extractU4();
         classObjectID = buffer.extractID();
         int bufferLength = buffer.extractU4();
-        this.buffer = new HeapProfileRecord(buffer.read(bufferLength));
+        this.buffer = new EncodedChunk(buffer.read(bufferLength));
     }
 
     public void inflate(ClassObject classObject) {
