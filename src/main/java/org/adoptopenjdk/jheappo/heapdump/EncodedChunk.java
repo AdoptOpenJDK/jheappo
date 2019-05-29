@@ -4,6 +4,16 @@ import java.io.PrintStream;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 import org.adoptopenjdk.jheappo.objects.BasicDataTypes;
 
+/**
+ * A wrapper around bytes that represents the encoding used by the hprof binary format.
+ *
+ * This is used by various hprof record types representing stack frames, objects in the heap, etc to decode the
+ * corresponding components (e.g. id numbers). Notably, most things are represented as unsigned ints, which we cannot
+ * represent well (yet).
+ *
+ * See https://hg.openjdk.java.net/jdk/jdk/file/9a73a4e4011f/src/hotspot/share/services/heapDumper.cpp for details on
+ * the format.
+ */
 public class EncodedChunk {
     private final byte[] body;
     private int index;
