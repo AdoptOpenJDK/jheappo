@@ -19,7 +19,7 @@ class LoadClass(body: EncodedChunk) : HeapProfileRecord() {
      */
 
     companion object {
-        const val TAG = 0x02
+        const val TAG: UByte = 0x02U
     }
 
     val classSerialNumber: Long = body.extractU4().toLong()

@@ -18,9 +18,13 @@ u4 number of bytes that follow
  */
 class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
 
-    private val stackTraceSerialNumber: Int
-    private val classObjectID: Long
-    private var instanceFieldValues = arrayOf<BasicDataTypeValue>()
+    companion object {
+        const val TAG: UByte = 0x21U
+    }
+    val stackTraceSerialNumber: UInt
+    val classObjectID: Long
+    var instanceFieldValues = arrayOf<BasicDataTypeValue>()
+
     private var buffer: EncodedChunk? = null
 
     init {
@@ -28,7 +32,7 @@ class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
         stackTraceSerialNumber = buffer.extractU4()
         classObjectID = buffer.extractID()
         val bufferLength = buffer.extractU4()
-        this.buffer = EncodedChunk(buffer.read(bufferLength))
+        this.buffer = EncodedChunk(buffer.read(bufferLength.toInt()))
     }
 
     fun inflate(classObject: ClassObject) {
@@ -49,22 +53,5 @@ class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
             prefix += instanceFieldValues[i].toString() + ", "
         }
         return prefix
-    }
-
-    fun stackTraceSerialNumber(): Int {
-        return stackTraceSerialNumber
-    }
-
-    fun classObjectID(): Long {
-        return classObjectID
-    }
-
-    fun instanceFieldValues(): Array<BasicDataTypeValue> {
-        return instanceFieldValues
-    }
-
-    companion object {
-
-        val TAG = 0x21
     }
 }

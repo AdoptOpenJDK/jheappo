@@ -17,12 +17,12 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 class RootThreadObject(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
-        const val TAG = 0x08
+        const val TAG: UByte = 0x08U
     }
 
-    val serialNumber: Int = buffer.extractU4()
+    val serialNumber: UInt = buffer.extractU4()
 
-    val traceSerialNumber: Int = buffer.extractU4()
+    val traceSerialNumber: UInt = buffer.extractU4()
 
     override fun toString(): String {
         return "Root Thread Object : $serialNumber : $traceSerialNumber"

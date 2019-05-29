@@ -97,8 +97,8 @@ class HeapDumpSegment(private val body: EncodedChunk) : HeapProfileRecord() {
     */
 
     companion object {
-        const val TAG1 = 0x0C
-        const val TAG2 = 0x1C
+        const val TAG1: UByte = 0x0CU
+        const val TAG2: UByte = 0x1CU
     }
 
     fun hasNext(): Boolean {
@@ -106,8 +106,7 @@ class HeapDumpSegment(private val body: EncodedChunk) : HeapProfileRecord() {
     }
 
     fun next(): HeapObject? {
-        when (val typeCode = body.extractU1().toInt()) {
-            // TODO use unsigned ints
+        when (val typeCode = body.extractU1()) {
             RootUnknown.TAG -> return RootUnknown(body)
             RootJNIGlobal.TAG -> return RootJNIGlobal(body)
             RootJNILocal.TAG -> return RootJNILocal(body)

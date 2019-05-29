@@ -10,6 +10,6 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 
 class RootMonitorUsed(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
-        const val TAG = 0x07
+        const val TAG: UByte = 0x07U
     }
 }

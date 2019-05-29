@@ -11,12 +11,12 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 class RootJNILocal(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
-        const val TAG = 0x02
+        const val TAG: UByte = 0x02U
     }
 
-    private val threadSerialNumber: Int = buffer.extractU4()
+    private val threadSerialNumber: UInt = buffer.extractU4()
 
     // -1 if empty
-    private val frameNumberInStackTrace: Int = buffer.extractU4()
+    private val frameNumberInStackTrace: UInt = buffer.extractU4()
 
 }

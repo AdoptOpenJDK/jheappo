@@ -64,7 +64,7 @@ class JavaHeap {
                                         clazzFile.write(heapObject.toString() + "\n")
                                     } else if (heapObject is InstanceObject) {
                                         val instanceObject = heapObject as InstanceObject?
-                                        instanceObject!!.inflate(this.getClazzById(instanceObject.classObjectID()))
+                                        instanceObject!!.inflate(this.getClazzById(instanceObject.classObjectID))
                                         oopTable[heapObject.id] = instanceObject
                                         instanceFile.write(heapObject.toString() + "\n")
                                     } else if (heapObject is RootJNIGlobal) {

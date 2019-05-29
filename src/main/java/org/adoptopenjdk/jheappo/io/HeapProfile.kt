@@ -45,7 +45,7 @@ class HeapProfile(private val path: Path, private val input: DataInputStream) {
     }
 
     fun extract(): HeapProfileRecord {
-        val tag = input.readByte().toInt()
+        val tag = EncodedChunk(byteArrayOf(input.readByte())).extractU1()
         val timeStamp = input.readInt().toLong()
         val bodySize = input.readInt()
         when (tag) {

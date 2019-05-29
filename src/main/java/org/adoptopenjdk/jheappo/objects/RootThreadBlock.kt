@@ -11,10 +11,10 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 class RootThreadBlock(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
-        const val TAG = 0x06
+        const val TAG: UByte = 0x06U
     }
 
-    private val threadSerialNumber: Int = buffer.extractU4()
+    private val threadSerialNumber: UInt = buffer.extractU4()
 
     override fun toString(): String {
         return "Root Sticky Class : $id : $threadSerialNumber"

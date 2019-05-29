@@ -11,8 +11,8 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 class RootNativeStack(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
-        const val TAG = 0x04
+        const val TAG: UByte = 0x04U
     }
 
-    private val threadSerialNumber: Int = buffer.extractU4()
+    private val threadSerialNumber: UInt = buffer.extractU4()
 }

@@ -28,7 +28,7 @@ class EncodedChunk private constructor(private val body: ByteArray, index: Int) 
     var index: Int = 0
         private set
 
-    constructor(body: ByteArray) : this(body, 0) {}
+    constructor(body: ByteArray) : this(body, 0)
 
     init {
         this.index = index
@@ -37,7 +37,7 @@ class EncodedChunk private constructor(private val body: ByteArray, index: Int) 
     fun read(bufferLength: Int): ByteArray {
         val buffer = ByteArray(bufferLength)
         for (i in 0 until bufferLength) {
-            buffer[i] = (body[index++].toInt() and 0xff).toByte()
+            buffer[i] = body[index++]
         }
         return buffer
     }
@@ -54,72 +54,75 @@ class EncodedChunk private constructor(private val body: ByteArray, index: Int) 
         return body.size <= index
     }
 
-    private fun read(): Int {
-        return body[index++].toInt() and 0xff
+    private fun read(): UByte {
+        return body[index++].toUByte()
     }
 
-    fun extractU1(): Byte {
-        return read().toByte()
+    fun extractU1(): UByte {
+        return read()
     }
 
-    fun extractU2(): Short {
-        var value = extractU1().toInt()
+    fun extractU2(): UShort {
+        // shifts only implemented for int and long
+        var value = extractU1().toUInt()
         for (cursor in 1..1) {
-            value = value shl 8 or read()
+            value = value shl 8 or read().toUInt()
         }
-        return value.toShort()
+        return value.toUShort()
     }
 
-    fun extractU4(): Int {
-        var value = extractU1().toInt()
+    fun extractU4(): UInt {
+        var value = extractU1().toUInt()
         for (cursor in 1..3) {
-            value = value shl 8 or read()
+            value = value shl 8 or read().toUInt()
         }
         return value
     }
 
-    fun extractU8(): Long {
-        var value = extractU1().toLong()
+    fun extractU8(): ULong {
+        var value = extractU1().toULong()
         for (cursor in 1..7) {
-            value = value shl 8 or read().toLong()
+            value = value shl 8 or read().toULong()
         }
         return value
     }
 
     fun extractID(): Long {
-        return extractU8()
+        // TODO what if identifiers are 4 bytes?
+        return extractU8().toLong()
     }
 
-    fun extractBoolean(): Boolean {
+    private fun extractBoolean(): Boolean {
         return extractU1().toInt() != 0
     }
 
-    fun extractChar(): Char {
-        return extractU2().toChar()
+    private fun extractChar(): Char {
+        // no toChar() on UShort
+        return extractU2().toInt().toChar()
     }
 
-    fun extractByte(): Byte {
-        return extractU1()
+    private fun extractByte(): Byte {
+        return extractU1().toByte()
     }
 
-    fun extractShort(): Short {
-        return extractU2()
+    private fun extractShort(): Short {
+        return extractU2().toShort()
     }
 
-    fun extractFloat(): Float {
+    private fun extractFloat(): Float {
         return java.lang.Float.intBitsToFloat(extractInt())
     }
 
-    fun extractInt(): Int {
-        return extractU4()
+    private fun extractInt(): Int {
+        return extractU4().toInt()
     }
 
-    fun extractDouble(): Double {
+    private fun extractDouble(): Double {
         return java.lang.Double.longBitsToDouble(extractLong())
     }
 
-    fun extractLong(): Long {
-        return extractU8()
+    private fun extractLong(): Long {
+        return extractU8().toLong()
     }
 
     fun extractBasicType(basicType: BasicDataTypes): BasicDataTypeValue {

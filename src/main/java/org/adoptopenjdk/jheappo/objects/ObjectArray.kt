@@ -18,17 +18,17 @@ ID array class object ID
  */
 class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
-        const val TAG = 0x22
+        const val TAG: UByte = 0x22U
     }
 
-    private val stackTraceSerialNumber: Int = buffer.extractInt()
-    val size: Int = buffer.extractInt()
+    private val stackTraceSerialNumber: UInt = buffer.extractU4()
+    val size: UInt = buffer.extractU4()
     private val elementsObjectID: Long = buffer.extractID()
 
     private val elements: Array<ObjectValue>
 
     init {
-        elements = (0 until size).map { buffer.extractBasicType(BasicDataTypes.OBJECT) }
+        elements = (0U until size).map { buffer.extractBasicType(BasicDataTypes.OBJECT) }
                 .map { it as ObjectValue }
                 .toTypedArray()
     }

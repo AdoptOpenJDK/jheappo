@@ -11,6 +11,6 @@ import org.adoptopenjdk.jheappo.io.HeapProfileRecord
 
 class CPUSamples(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
-        const val TAG = 0x0D
+        const val TAG: UByte = 0x0DU
     }
 }

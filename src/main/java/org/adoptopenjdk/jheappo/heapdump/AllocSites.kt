@@ -11,6 +11,6 @@ import org.adoptopenjdk.jheappo.io.HeapProfileRecord
 
 class AllocSites(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
-        const val TAG = 0x06
+        const val TAG: UByte = 0x06U
     }
 }
