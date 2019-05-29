@@ -1,14 +1,27 @@
 package org.adoptopenjdk.jheappo.model
 
-import org.adoptopenjdk.jheappo.heapdump.*
+import org.adoptopenjdk.jheappo.io.HeapDumpSegment
 import org.adoptopenjdk.jheappo.io.HeapProfile
-import org.adoptopenjdk.jheappo.model.HeapGraphExtras.*
-import org.adoptopenjdk.jheappo.objects.*
-import org.neo4j.graphdb.*
+import org.adoptopenjdk.jheappo.io.LoadClass
+import org.adoptopenjdk.jheappo.io.StackFrame
+import org.adoptopenjdk.jheappo.io.StackTrace
+import org.adoptopenjdk.jheappo.io.UTF8StringSegment
+import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Labels
+import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Relationships
+import org.adoptopenjdk.jheappo.objects.ClassObject
+import org.adoptopenjdk.jheappo.objects.InstanceObject
+import org.adoptopenjdk.jheappo.objects.ObjectArray
+import org.adoptopenjdk.jheappo.objects.PrimitiveArray
+import org.adoptopenjdk.jheappo.objects.RootJavaFrame
+import org.adoptopenjdk.jheappo.objects.RootThreadObject
+import org.adoptopenjdk.jheappo.objects.UTF8String
+import org.neo4j.graphdb.GraphDatabaseService
+import org.neo4j.graphdb.Node
+import org.neo4j.graphdb.Transaction
 import org.neo4j.graphdb.factory.GraphDatabaseFactory
 import org.neo4j.io.fs.FileUtils
-
-import java.io.*
+import java.io.File
+import java.io.PrintStream
 import java.util.HashMap
 import java.util.HashSet
 
