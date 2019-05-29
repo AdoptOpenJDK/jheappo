@@ -2,8 +2,17 @@ package org.adoptopenjdk.jheappo.heapdump
 
 import java.io.PrintStream
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
+import org.adoptopenjdk.jheappo.model.BooleanValue
+import org.adoptopenjdk.jheappo.model.ByteValue
+import org.adoptopenjdk.jheappo.model.CharValue
+import org.adoptopenjdk.jheappo.model.DoubleValue
+import org.adoptopenjdk.jheappo.model.FloatValue
+import org.adoptopenjdk.jheappo.model.IntValue
+import org.adoptopenjdk.jheappo.model.LongValue
+import org.adoptopenjdk.jheappo.model.ObjectValue
+import org.adoptopenjdk.jheappo.model.ShortValue
+import org.adoptopenjdk.jheappo.model.UnknownValue
 import org.adoptopenjdk.jheappo.objects.BasicDataTypes
-import kotlin.experimental.and
 
 /**
  * A wrapper around bytes that represents the encoding used by the hprof binary format.
@@ -115,16 +124,17 @@ class EncodedChunk private constructor(private val body: ByteArray, index: Int) 
 
     fun extractBasicType(basicType: BasicDataTypes): BasicDataTypeValue {
         return when (basicType) {
-            BasicDataTypes.BOOLEAN -> BasicDataTypeValue(this.extractBoolean(), BasicDataTypes.BOOLEAN)
-            BasicDataTypes.CHAR -> BasicDataTypeValue(this.extractChar(), BasicDataTypes.CHAR)
-            BasicDataTypes.BYTE -> BasicDataTypeValue(this.extractByte(), BasicDataTypes.BYTE)
-            BasicDataTypes.SHORT -> BasicDataTypeValue(this.extractShort(), BasicDataTypes.SHORT)
-            BasicDataTypes.FLOAT -> BasicDataTypeValue(this.extractFloat(), BasicDataTypes.FLOAT)
-            BasicDataTypes.INT -> BasicDataTypeValue(this.extractInt(), BasicDataTypes.INT)
-            BasicDataTypes.OBJECT -> BasicDataTypeValue(this.extractID(), BasicDataTypes.OBJECT)
-            BasicDataTypes.DOUBLE -> BasicDataTypeValue(this.extractDouble(), BasicDataTypes.DOUBLE)
-            BasicDataTypes.LONG -> BasicDataTypeValue(this.extractLong(), BasicDataTypes.LONG)
-            else -> BasicDataTypeValue(null, BasicDataTypes.UNKNOWN)
+            BasicDataTypes.BOOLEAN -> BooleanValue(this.extractBoolean())
+            BasicDataTypes.CHAR -> CharValue(this.extractChar())
+            BasicDataTypes.BYTE -> ByteValue(this.extractByte())
+            BasicDataTypes.SHORT -> ShortValue(this.extractShort())
+            BasicDataTypes.FLOAT -> FloatValue(this.extractFloat())
+            BasicDataTypes.INT -> IntValue(this.extractInt())
+            BasicDataTypes.OBJECT -> ObjectValue(this.extractID())
+            BasicDataTypes.DOUBLE -> DoubleValue(this.extractDouble())
+            BasicDataTypes.LONG -> LongValue(this.extractLong())
+            // TODO arrays?
+            else -> UnknownValue
         }
     }
 

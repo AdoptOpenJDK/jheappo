@@ -21,6 +21,7 @@ enum class BasicDataTypes constructor(
     SHORT(9, "short", 'S', 2),
     INT(10, "int", 'I', 4),
     LONG(11, "long", 'L', 8),
+    // TODO Not found in https://hg.openjdk.java.net/jdk/jdk/file/9a73a4e4011f/src/hotspot/share/services/heapDumper.cpp
     ARRAY(12, "", '[', 0),
     UNKNOWN(-1, "", ' ', -1);
 
@@ -29,21 +30,7 @@ enum class BasicDataTypes constructor(
     }
 
     companion object {
-        fun fromInt(typeIndex: Int): BasicDataTypes? {
-            return when (typeIndex) {
-                2 -> OBJECT
-                4 -> BOOLEAN
-                5 -> CHAR
-                6 -> FLOAT
-                7 -> DOUBLE
-                8 -> BYTE
-                9 -> SHORT
-                10 -> INT
-                11 -> LONG
-                12 -> ARRAY
-                else -> null
-            }
-        }
+        fun fromInt(typeIndex: Int): BasicDataTypes? = values().firstOrNull { it.ordinalValue == typeIndex }
     }
 
 }

@@ -7,7 +7,7 @@ package org.adoptopenjdk.jheappo.objects
  */
 
 import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
-import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
+import org.adoptopenjdk.jheappo.model.ObjectValue
 
 /*
 ID array object ID
@@ -25,13 +25,15 @@ class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
     val size: Int = buffer.extractInt()
     private val elementsObjectID: Long = buffer.extractID()
 
-    private val elements: Array<BasicDataTypeValue>
+    private val elements: Array<ObjectValue>
 
     init {
-        elements = (0 until size).map { buffer.extractBasicType(BasicDataTypes.OBJECT) }.toTypedArray()
+        elements = (0 until size).map { buffer.extractBasicType(BasicDataTypes.OBJECT) }
+                .map { it as ObjectValue }
+                .toTypedArray()
     }
 
     fun getValueObjectIDAt(index: Int): Long {
-        return elements[index].value as Long
+        return elements[index].objectId
     }
 }
