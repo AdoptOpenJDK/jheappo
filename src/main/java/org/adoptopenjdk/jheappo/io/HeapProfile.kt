@@ -13,8 +13,8 @@ import java.nio.file.Path
 class HeapProfile(private val path: Path, private val input: DataInputStream) {
 
     companion object {
-        fun open(path: Path): HeapProfile {
-            val input = DataInputStream(BufferedInputStream(FileInputStream(path.toFile())))
+        fun open(path: Path, inputStream: InputStream): HeapProfile {
+            val input = DataInputStream(BufferedInputStream(inputStream))
             return HeapProfile(path, input)
         }
     }

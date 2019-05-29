@@ -17,13 +17,13 @@ import org.adoptopenjdk.jheappo.objects.RootMonitorUsed
 import org.adoptopenjdk.jheappo.objects.RootStickyClass
 import org.adoptopenjdk.jheappo.objects.RootThreadObject
 import org.adoptopenjdk.jheappo.objects.UTF8String
-import java.io.BufferedWriter
-import java.io.FileWriter
 import java.io.PrintStream
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.HashMap
 import java.util.HashSet
 
-class JavaHeap {
+class JavaHeap(private val outputDir: Path) {
 
     internal var stringTable = HashMap<Long, UTF8String>()
     internal var clazzTable = HashMap<Long, ClassObject>()
@@ -39,10 +39,10 @@ class JavaHeap {
     internal var objectArray = HashMap<Long, ObjectArray>()
 
     fun populateFrom(heapDump: HeapProfile) {
-        BufferedWriter(FileWriter("string.table")).use { out ->
-            BufferedWriter(FileWriter("class.table")).use { clazzFile ->
-                BufferedWriter(FileWriter("instance.table")).use { instanceFile ->
-                    BufferedWriter(FileWriter("loadClass.table")).use { loadClassFile ->
+        Files.newBufferedWriter(outputDir.resolve("string.table")).use { out ->
+            Files.newBufferedWriter(outputDir.resolve("class.table")).use { clazzFile ->
+                Files.newBufferedWriter(outputDir.resolve("instance.table")).use { instanceFile ->
+                    Files.newBufferedWriter(outputDir.resolve("loadClass.table")).use { loadClassFile ->
                         val header = heapDump.readHeader()
                         println("Header: $header")
 
