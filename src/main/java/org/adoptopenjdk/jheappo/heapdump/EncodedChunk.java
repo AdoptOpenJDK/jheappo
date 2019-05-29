@@ -28,12 +28,15 @@ public class EncodedChunk {
     protected byte[] getBody() {
         return body;
     }
+
     public void skip(int skipOver) {
         index += skipOver;
     }
+
     public byte[] readRemaining() {
         return read( body.length - index);
     }
+
     public int getIndex() { return index; }
 
     public boolean endOfBuffer() {  return getBody().length <= index; }
