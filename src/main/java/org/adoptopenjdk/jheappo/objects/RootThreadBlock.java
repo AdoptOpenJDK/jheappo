@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 
 public class RootThreadBlock extends HeapObject {
 
@@ -14,7 +14,7 @@ public class RootThreadBlock extends HeapObject {
 
     private int threadSerialNumber;
 
-    public RootThreadBlock(HeapProfileRecord buffer) {
+    public RootThreadBlock(EncodedChunk buffer) {
         super( buffer);
         threadSerialNumber = buffer.extractU4();
     }

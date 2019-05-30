@@ -13,7 +13,5 @@ public class StartThread extends HeapProfileRecord {
 
     public final static int TAG = 0x0A;
 
-    public StartThread(byte[] body) {
-        super(body);
-    }
+    public StartThread(EncodedChunk body) { }
 }

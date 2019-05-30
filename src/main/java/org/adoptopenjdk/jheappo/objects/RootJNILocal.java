@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 
 public class RootJNILocal extends HeapObject {
 
@@ -15,7 +15,7 @@ public class RootJNILocal extends HeapObject {
     private int threadSerialNumber;
     private int frameNumberInStackTrace; // -1 if empty
 
-    public RootJNILocal(HeapProfileRecord buffer) {
+    public RootJNILocal(EncodedChunk buffer) {
         super(buffer);
         threadSerialNumber = buffer.extractU4();
         frameNumberInStackTrace = buffer.extractU4();

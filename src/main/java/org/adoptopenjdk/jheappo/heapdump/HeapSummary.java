@@ -12,7 +12,5 @@ public class HeapSummary extends HeapProfileRecord {
 
     public final static int TAG = 0x07;
 
-    public HeapSummary(byte[] body) {
-        super(body);
-    }
+    public HeapSummary(EncodedChunk body) { }
 }

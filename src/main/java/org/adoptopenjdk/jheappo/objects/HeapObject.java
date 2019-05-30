@@ -1,8 +1,8 @@
 package org.adoptopenjdk.jheappo.objects;
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 
-public class HeapObject {
+public abstract class HeapObject {
 
     private long id;
 
@@ -10,7 +10,7 @@ public class HeapObject {
         this.id = -1;
     }
 
-    public HeapObject(HeapProfileRecord buffer) {
+    public HeapObject(EncodedChunk buffer) {
         id = buffer.extractID();
     }
 

@@ -6,8 +6,8 @@ package org.adoptopenjdk.jheappo.heapdump;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-
 import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.objects.UTF8String;
 
 public class UTF8StringSegment extends HeapProfileRecord {
 
@@ -18,9 +18,14 @@ public class UTF8StringSegment extends HeapProfileRecord {
 
     public final static int TAG = 0x01;
 
+    private final EncodedChunk body;
 
-    public UTF8StringSegment(byte[] body) {
-        super(body);
+    public UTF8StringSegment(EncodedChunk body) {
+        this.body = body;
     }
 
+    public UTF8String toUtf8String() {
+        // defer UTF8 parsing
+        return new UTF8String(body.copy());
+    }
 }

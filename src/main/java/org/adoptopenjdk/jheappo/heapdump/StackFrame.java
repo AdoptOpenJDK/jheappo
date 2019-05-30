@@ -32,13 +32,12 @@ public class StackFrame extends HeapProfileRecord {
     long sourceFileNameStringID;
     long classSerialNumber;
 
-    public StackFrame(byte[] body) {
-        super(body);
-        stackFrameID = extractID();
-        methodNameStringID = extractID();
-        methodSignatureStringID = extractID();
-        sourceFileNameStringID = extractID();
-        classSerialNumber = extractID();
+    public StackFrame(EncodedChunk body) {
+        stackFrameID = body.extractID();
+        methodNameStringID = body.extractID();
+        methodSignatureStringID = body.extractID();
+        sourceFileNameStringID = body.extractID();
+        classSerialNumber = body.extractID();
     }
 
     public String toString() {

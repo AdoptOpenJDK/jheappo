@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 /*
@@ -61,12 +61,12 @@ public class ClassObject extends HeapObject {
     long[] fieldNamesIndicies;
     int[] fieldTypes;
 
-    public ClassObject(HeapProfileRecord buffer) {
+    public ClassObject(EncodedChunk buffer) {
         super(buffer); //classObjectID;
         extractPoolData( buffer);
     }
 
-    private void extractPoolData( HeapProfileRecord buffer) {
+    private void extractPoolData( EncodedChunk buffer) {
         stackTraceSerialNumber = buffer.extractU4();
         superClassObjectID = buffer.extractID();
         classLoaderObjectID = buffer.extractID();
@@ -86,7 +86,7 @@ public class ClassObject extends HeapObject {
                   | u1    | type of entry: (See Basic Type)
                   | value | value of entry (u1, u2, u4, or u8 based on type of entry)
      */
-    private void extractConstantPool( HeapProfileRecord buffer) {
+    private void extractConstantPool( EncodedChunk buffer) {
         int numberOfRecords = buffer.extractU2();
         for ( int i = 0; i < numberOfRecords; i++) {
             int constantPoolIndex = buffer.extractU2();
@@ -101,7 +101,7 @@ public class ClassObject extends HeapObject {
               | u1    | type of field: (See Basic Type)
               | value | value of entry (u1, u2, u4, or u8 based on type of field)
      */
-    private void extractStaticFields( HeapProfileRecord buffer) {
+    private void extractStaticFields( EncodedChunk buffer) {
         int numberOfRecords = buffer.extractU2();
         staticFieldNameIndicies = new long[numberOfRecords];
         staticValues = new BasicDataTypeValue[numberOfRecords];
@@ -117,7 +117,7 @@ public class ClassObject extends HeapObject {
               | ID    | field name string ID
               | u1    | type of field: (See Basic Type)
      */
-    private void extractInstanceFields( HeapProfileRecord buffer) {
+    private void extractInstanceFields( EncodedChunk buffer) {
         int numberOfInstanceFields = buffer.extractU2();
         if ( numberOfInstanceFields > -1) {
             fieldNamesIndicies = new long[numberOfInstanceFields];

@@ -25,14 +25,13 @@ public class StackTrace extends HeapProfileRecord {
     int numberOfFrames;
     long[] stackFrameIDs;
 
-    public StackTrace(byte[] body) {
-        super(body);
-        stackTraceSerialNumber = extractU4();
-        threadSerialNumber = extractU4();
-        numberOfFrames = extractU4();
+    public StackTrace(EncodedChunk body) {
+        stackTraceSerialNumber = body.extractU4();
+        threadSerialNumber = body.extractU4();
+        numberOfFrames = body.extractU4();
         stackFrameIDs = new long[numberOfFrames];
         for ( int i = 0; i < numberOfFrames; i++) {
-            stackFrameIDs[i] = extractID();
+            stackFrameIDs[i] = body.extractID();
         }
     }
 

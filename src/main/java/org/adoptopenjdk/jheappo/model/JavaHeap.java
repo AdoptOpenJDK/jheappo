@@ -47,14 +47,14 @@ public class JavaHeap {
                 } else if (frame instanceof StackTrace) {
                     // Do Nothing
                 } else if (frame instanceof UTF8StringSegment) {
-                    UTF8String string = new UTF8String(frame);
+                    UTF8String string = ((UTF8StringSegment) frame).toUtf8String();
                     stringTable.put(string.getId(), string);
                     out.write(Long.toString(string.getId()) + "->" + string.getString() + "\n");
                 } else if (frame instanceof LoadClass) {
                     loadClassTable.put(((LoadClass) frame).getClassObjectID(), (LoadClass) frame); //store mapping of class to class name.
                     out.write(frame.toString() + "\n");
                 } else if (frame instanceof HeapDumpSegment) {
-                    while (!frame.endOfBuffer()) {
+                    while (!((HeapDumpSegment) frame).hasNext()) {
                         HeapObject heapObject = ((HeapDumpSegment) frame).next();
                         if (heapObject == null) {
                             System.out.println("parser error resolving type in HeapDumpSegment....");

@@ -13,7 +13,5 @@ public class CPUSamples extends HeapProfileRecord {
 
     public final static int TAG = 0x0D;
 
-    public CPUSamples(byte[] body) {
-        super(body);
-    }
+    public CPUSamples(EncodedChunk body) { }
 }

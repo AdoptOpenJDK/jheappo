@@ -1,5 +1,6 @@
 package org.adoptopenjdk.jheappo.io;
 
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
@@ -10,7 +11,7 @@ public class HeapDumpSectionTest {
     @Test
     public void testBufferReading() {
         byte[] one = { 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 10, 10, 10, 10 };
-        SimpleRecord buffer = new SimpleRecord(one);
+        EncodedChunk buffer = new EncodedChunk(one);
         assertEquals("", 0, buffer.extractU1());
         assertEquals("", 0, buffer.extractU2());
         assertEquals("", 16777216, buffer.extractU4());
@@ -18,10 +19,4 @@ public class HeapDumpSectionTest {
         assertTrue( buffer.endOfBuffer());
     }
 
-    public class SimpleRecord extends HeapProfileRecord {
-
-        public SimpleRecord(byte[] buffer) {
-            super(buffer);
-        }
-    }
 }

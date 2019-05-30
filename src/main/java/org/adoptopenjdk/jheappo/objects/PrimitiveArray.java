@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo.objects;
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord;
+import org.adoptopenjdk.jheappo.heapdump.EncodedChunk;
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue;
 
 
@@ -20,7 +20,7 @@ public class PrimitiveArray extends HeapObject {
     private char signature = ' ';
     BasicDataTypeValue[] elements;
 
-    public PrimitiveArray(HeapProfileRecord buffer) {
+    public PrimitiveArray(EncodedChunk buffer) {
         super(buffer);
         stackTraceSerialNumber = buffer.extractInt();
         size = buffer.extractInt();
@@ -28,7 +28,7 @@ public class PrimitiveArray extends HeapObject {
         readArray(buffer,elementType,size);
     }
 
-    private void readArray(HeapProfileRecord buffer, byte elementType, int size) {
+    private void readArray(EncodedChunk buffer, byte elementType, int size) {
         BasicDataTypes dataType = BasicDataTypes.fromInt(elementType);
         signature = BasicDataTypes.fromInt(elementType).getMnemonic();
         if ( dataType.equals(BasicDataTypes.UNKNOWN)) {
