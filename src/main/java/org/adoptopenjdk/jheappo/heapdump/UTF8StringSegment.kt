@@ -17,7 +17,7 @@ class UTF8StringSegment(private val body: EncodedChunk) : HeapProfileRecord() {
      */
 
     companion object {
-        const val TAG = 0x01
+        const val TAG: UByte = 0x01U
     }
 
     fun toUtf8String(): UTF8String {

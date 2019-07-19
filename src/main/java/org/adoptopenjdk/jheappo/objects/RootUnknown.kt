@@ -11,7 +11,7 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 class RootUnknown(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
-        const val TAG = 0xFF
+        const val TAG: UByte = 0xFFU
     }
 
     override fun toString(): String {

@@ -10,6 +10,6 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 
 class RootStickyClass(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
-        const val TAG = 0x05
+        const val TAG: UByte = 0x05U
     }
 }

@@ -24,7 +24,7 @@ import org.adoptopenjdk.jheappo.io.HeapProfileRecord
 
 class StackFrame(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
-        const val TAG = 0x04
+        const val TAG: UByte = 0x04U
     }
 
     internal val stackFrameID: Long = body.extractID()

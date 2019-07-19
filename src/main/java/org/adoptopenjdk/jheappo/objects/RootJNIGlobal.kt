@@ -15,7 +15,7 @@ import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 class RootJNIGlobal(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
-        const val TAG = 0x01
+        const val TAG: UByte = 0x01U
     }
 
     val jniGlobalRefID: Long = buffer.extractID()

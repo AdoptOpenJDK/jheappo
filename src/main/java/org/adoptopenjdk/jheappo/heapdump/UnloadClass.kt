@@ -16,7 +16,7 @@ class UnloadClass(body: EncodedChunk) : HeapProfileRecord() {
      */
 
     companion object {
-        const val TAG = 0x03
+        const val TAG: UByte = 0x03U
     }
 
     internal val classSerialNumber: Long = body.extractU4().toLong()

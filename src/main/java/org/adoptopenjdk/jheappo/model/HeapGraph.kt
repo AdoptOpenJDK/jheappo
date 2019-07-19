@@ -76,20 +76,20 @@ class HeapGraph(private val path: File) {
                                 count++
                             }
                             is InstanceObject -> {
-                                heapObject.inflate(this.getClazzById(heapObject.classObjectID()))
+                                heapObject.inflate(this.getClazzById(heapObject.classObjectID))
                                 // oopTable.put(heapObject.getId(), instanceObject);
                                 // instanceFile.write(heapObject.toString() + "\n");
                                 val node = mergeNode(db, instanceNodes, Labels.Instance, heapObject.id)
                                 count++
-                                node.setProperty("stackSerial", heapObject.stackTraceSerialNumber())
-                                val classObject = getClazzById(heapObject.classObjectID())
-                                val classNode = mergeNode(db, clazzNodes, Labels.Class, heapObject.classObjectID())
+                                node.setProperty("stackSerial", heapObject.stackTraceSerialNumber)
+                                val classObject = getClazzById(heapObject.classObjectID)
+                                val classNode = mergeNode(db, clazzNodes, Labels.Class, heapObject.classObjectID)
                                 count++
                                 node.createRelationshipTo(classNode, Relationships.IS_CLASS)
                                 count++
                                 for (i in 0 until classObject.fieldNamesIndicies.size) {
                                     val index = classObject.fieldNamesIndicies[i]
-                                    when (val value = heapObject.instanceFieldValues()[i]) {
+                                    when (val value = heapObject.instanceFieldValues[i]) {
                                         is ObjectValue -> {
                                             val other = mergeNode(db, instanceNodes, Labels.Instance, value.objectId)
                                             count++

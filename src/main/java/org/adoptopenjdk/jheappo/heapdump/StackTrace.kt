@@ -19,18 +19,18 @@ class StackTrace(body: EncodedChunk) : HeapProfileRecord() {
      */
 
     companion object {
-        const val TAG = 0x05
+        const val TAG: UByte = 0x05U
     }
 
-    internal val stackTraceSerialNumber: Int = body.extractU4()
-    internal val threadSerialNumber: Int = body.extractU4()
-    internal val numberOfFrames: Int = body.extractU4()
+    internal val stackTraceSerialNumber: UInt = body.extractU4()
+    internal val threadSerialNumber: UInt = body.extractU4()
+    internal val numberOfFrames: UInt = body.extractU4()
 
     internal val stackFrameIDs: LongArray
 
     init {
-        stackFrameIDs = LongArray(numberOfFrames)
-        for (i in 0 until numberOfFrames) {
+        stackFrameIDs = LongArray(numberOfFrames.toInt())
+        for (i in 0 until numberOfFrames.toInt()) {
             stackFrameIDs[i] = body.extractID()
         }
     }

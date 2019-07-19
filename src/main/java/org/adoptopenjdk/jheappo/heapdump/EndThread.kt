@@ -11,6 +11,6 @@ import org.adoptopenjdk.jheappo.io.HeapProfileRecord
 
 class EndThread(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
-        const val TAG = 0x0B
+        const val TAG: UByte = 0x0BU
     }
 }

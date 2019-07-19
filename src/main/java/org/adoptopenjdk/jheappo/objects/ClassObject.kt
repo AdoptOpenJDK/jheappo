@@ -45,16 +45,16 @@ import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
 
 class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
-        const val TAG = 0x20
+        const val TAG: UByte = 0x20U
     }
 
-    internal val stackTraceSerialNumber: Int = buffer.extractU4()
+    internal val stackTraceSerialNumber: UInt = buffer.extractU4()
     internal val superClassObjectID: Long = buffer.extractID()
     internal val classLoaderObjectID: Long = buffer.extractID()
     internal val signersObjectID: Long = buffer.extractID()
     internal val protectionDomainObjectID: Long = buffer.extractID()
     internal val reserved = arrayOf(buffer.extractID(), buffer.extractID())
-    internal val instanceSizeInBytes: Int = buffer.extractU4()
+    internal val instanceSizeInBytes: UInt = buffer.extractU4()
 
     internal lateinit var staticFieldNameIndicies: LongArray
     internal lateinit var staticValues: Array<BasicDataTypeValue>
