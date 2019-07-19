@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.io
+package org.adoptopenjdk.jheappo.parser
 
 import java.io.PrintStream
 

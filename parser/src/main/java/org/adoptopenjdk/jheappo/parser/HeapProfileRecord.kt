@@ -1,20 +1,20 @@
-package org.adoptopenjdk.jheappo.io
+package org.adoptopenjdk.jheappo.parser
 
-import org.adoptopenjdk.jheappo.heap.ClassMetadata
-import org.adoptopenjdk.jheappo.heap.HeapObject
-import org.adoptopenjdk.jheappo.heap.InstanceObject
-import org.adoptopenjdk.jheappo.heap.ObjectArray
-import org.adoptopenjdk.jheappo.heap.PrimitiveArray
-import org.adoptopenjdk.jheappo.heap.RootJNIGlobal
-import org.adoptopenjdk.jheappo.heap.RootJNILocal
-import org.adoptopenjdk.jheappo.heap.RootJavaFrame
-import org.adoptopenjdk.jheappo.heap.RootMonitorUsed
-import org.adoptopenjdk.jheappo.heap.RootNativeStack
-import org.adoptopenjdk.jheappo.heap.RootStickyClass
-import org.adoptopenjdk.jheappo.heap.RootThreadBlock
-import org.adoptopenjdk.jheappo.heap.RootThreadObject
-import org.adoptopenjdk.jheappo.heap.RootUnknown
-import org.adoptopenjdk.jheappo.heap.UTF8String
+import org.adoptopenjdk.jheappo.parser.heap.ClassMetadata
+import org.adoptopenjdk.jheappo.parser.heap.HeapObject
+import org.adoptopenjdk.jheappo.parser.heap.InstanceObject
+import org.adoptopenjdk.jheappo.parser.heap.ObjectArray
+import org.adoptopenjdk.jheappo.parser.heap.PrimitiveArray
+import org.adoptopenjdk.jheappo.parser.heap.RootJNIGlobal
+import org.adoptopenjdk.jheappo.parser.heap.RootJNILocal
+import org.adoptopenjdk.jheappo.parser.heap.RootJavaFrame
+import org.adoptopenjdk.jheappo.parser.heap.RootMonitorUsed
+import org.adoptopenjdk.jheappo.parser.heap.RootNativeStack
+import org.adoptopenjdk.jheappo.parser.heap.RootStickyClass
+import org.adoptopenjdk.jheappo.parser.heap.RootThreadBlock
+import org.adoptopenjdk.jheappo.parser.heap.RootThreadObject
+import org.adoptopenjdk.jheappo.parser.heap.RootUnknown
+import org.adoptopenjdk.jheappo.parser.heap.UTF8String
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.

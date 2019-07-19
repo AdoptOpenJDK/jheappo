@@ -1,10 +1,10 @@
-package org.adoptopenjdk.jheappo.heap
+package org.adoptopenjdk.jheappo.parser.heap
 
-import org.adoptopenjdk.jheappo.io.EncodedChunk
-import org.adoptopenjdk.jheappo.io.BasicDataTypeValue
-import org.adoptopenjdk.jheappo.io.FieldType
-import org.adoptopenjdk.jheappo.io.Id
-import org.adoptopenjdk.jheappo.io.ObjectValue
+import org.adoptopenjdk.jheappo.parser.EncodedChunk
+import org.adoptopenjdk.jheappo.parser.BasicDataTypeValue
+import org.adoptopenjdk.jheappo.parser.FieldType
+import org.adoptopenjdk.jheappo.parser.Id
+import org.adoptopenjdk.jheappo.parser.ObjectValue
 
 sealed class HeapObject(buffer: EncodedChunk) {
     val id: Id = buffer.extractID()

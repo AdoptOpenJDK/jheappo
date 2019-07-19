@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.io
+package org.adoptopenjdk.jheappo.parser
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.

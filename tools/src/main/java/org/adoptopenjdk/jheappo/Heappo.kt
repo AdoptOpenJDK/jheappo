@@ -6,7 +6,7 @@ package org.adoptopenjdk.jheappo
  * Instructions: https://github.com/AdoptOpenJDK/jheappo/wiki
  */
 
-import org.adoptopenjdk.jheappo.io.HeapProfile
+import org.adoptopenjdk.jheappo.parser.HeapProfile
 import org.adoptopenjdk.jheappo.model.HeapGraph
 import org.adoptopenjdk.jheappo.model.JavaHeap
 

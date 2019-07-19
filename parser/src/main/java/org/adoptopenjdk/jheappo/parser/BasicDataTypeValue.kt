@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.io
+package org.adoptopenjdk.jheappo.parser
 
 /**
  * A lightweight representation of a value used in in arrays, field lists, etc. For primitives, the actual value is
