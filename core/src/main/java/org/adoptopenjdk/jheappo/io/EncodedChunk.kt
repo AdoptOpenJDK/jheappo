@@ -1,6 +1,6 @@
 package org.adoptopenjdk.jheappo.io
 
-import java.io.PrintStream
+import org.adoptopenjdk.jheappo.model.ArrayValue
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
 import org.adoptopenjdk.jheappo.model.BooleanValue
 import org.adoptopenjdk.jheappo.model.ByteValue
@@ -12,7 +12,8 @@ import org.adoptopenjdk.jheappo.model.LongValue
 import org.adoptopenjdk.jheappo.model.ObjectValue
 import org.adoptopenjdk.jheappo.model.ShortValue
 import org.adoptopenjdk.jheappo.model.UnknownValue
-import org.adoptopenjdk.jheappo.objects.BasicDataTypes
+import org.adoptopenjdk.jheappo.objects.FieldType
+import java.io.PrintStream
 
 /**
  * A wrapper around bytes that represents the encoding used by the hprof binary format.
@@ -125,24 +126,24 @@ class EncodedChunk private constructor(private val body: ByteArray, index: Int) 
         return extractU8().toLong()
     }
 
-    fun extractBasicType(basicType: BasicDataTypes): BasicDataTypeValue {
+    fun extractBasicType(basicType: FieldType): BasicDataTypeValue {
         return when (basicType) {
-            BasicDataTypes.BOOLEAN -> BooleanValue(this.extractBoolean())
-            BasicDataTypes.CHAR -> CharValue(this.extractChar())
-            BasicDataTypes.BYTE -> ByteValue(this.extractByte())
-            BasicDataTypes.SHORT -> ShortValue(this.extractShort())
-            BasicDataTypes.FLOAT -> FloatValue(this.extractFloat())
-            BasicDataTypes.INT -> IntValue(this.extractInt())
-            BasicDataTypes.OBJECT -> ObjectValue(this.extractID())
-            BasicDataTypes.DOUBLE -> DoubleValue(this.extractDouble())
-            BasicDataTypes.LONG -> LongValue(this.extractLong())
-            // TODO arrays?
-            else -> UnknownValue
+            FieldType.BOOLEAN -> BooleanValue(this.extractBoolean())
+            FieldType.CHAR -> CharValue(this.extractChar())
+            FieldType.BYTE -> ByteValue(this.extractByte())
+            FieldType.SHORT -> ShortValue(this.extractShort())
+            FieldType.FLOAT -> FloatValue(this.extractFloat())
+            FieldType.INT -> IntValue(this.extractInt())
+            FieldType.OBJECT -> ObjectValue(this.extractID())
+            FieldType.DOUBLE -> DoubleValue(this.extractDouble())
+            FieldType.LONG -> LongValue(this.extractLong())
+            FieldType.ARRAY -> ArrayValue
+            FieldType.UNKNOWN -> UnknownValue
         }
     }
 
-    fun extractBasicType(basicType: Int): BasicDataTypeValue {
-        return extractBasicType(BasicDataTypes.fromInt(basicType)!!)
+    fun extractBasicType(basicType: UByte): BasicDataTypeValue {
+        return extractBasicType(FieldType.fromInt(basicType))
     }
 
     /**

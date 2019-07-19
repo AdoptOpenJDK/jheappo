@@ -8,7 +8,7 @@ import org.adoptopenjdk.jheappo.io.StackTrace
 import org.adoptopenjdk.jheappo.io.UTF8StringSegment
 import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Labels
 import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Relationships
-import org.adoptopenjdk.jheappo.objects.ClassObject
+import org.adoptopenjdk.jheappo.objects.ClassMetadata
 import org.adoptopenjdk.jheappo.objects.InstanceObject
 import org.adoptopenjdk.jheappo.objects.ObjectArray
 import org.adoptopenjdk.jheappo.objects.PrimitiveArray
@@ -27,7 +27,7 @@ import java.util.HashSet
 
 class HeapGraph(private val path: File) {
     internal var stringTable = HashMap<Long, UTF8String>()
-    internal var clazzTable = HashMap<Long, ClassObject>()
+    internal var clazzTable = HashMap<Long, ClassMetadata>()
     internal var clazzNodes = HashMap<Long, Node>()
     internal var clazzNames = HashMap<Long, Long>()
     internal var instanceNodes = HashMap<Long, Node>()
@@ -70,7 +70,7 @@ class HeapGraph(private val path: File) {
                             continue
                         }
                         when (heapObject) {
-                            is ClassObject -> {
+                            is ClassMetadata -> {
                                 clazzTable[heapObject.id] = heapObject
                                 // clazzFile.write(heapObject.toString() + "\n");
                                 val node = mergeNode(db, clazzNodes, Labels.Class, heapObject.id)
@@ -206,7 +206,7 @@ class HeapGraph(private val path: File) {
         }
     }
 
-    fun getClazzById(cid: Long): ClassObject {
+    fun getClazzById(cid: Long): ClassMetadata {
         return clazzTable.getValue(cid)
     }
 

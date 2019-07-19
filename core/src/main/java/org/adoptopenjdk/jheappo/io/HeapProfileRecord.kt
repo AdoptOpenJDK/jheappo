@@ -1,6 +1,6 @@
 package org.adoptopenjdk.jheappo.io
 
-import org.adoptopenjdk.jheappo.objects.ClassObject
+import org.adoptopenjdk.jheappo.objects.ClassMetadata
 import org.adoptopenjdk.jheappo.objects.HeapObject
 import org.adoptopenjdk.jheappo.objects.InstanceObject
 import org.adoptopenjdk.jheappo.objects.ObjectArray
@@ -160,7 +160,7 @@ class HeapDumpSegment(private val body: EncodedChunk) : HeapProfileRecord() {
             RootThreadBlock.TAG -> return RootThreadBlock(body)
             RootMonitorUsed.TAG -> return RootMonitorUsed(body)
             RootThreadObject.TAG -> return RootThreadObject(body)
-            ClassObject.TAG -> return ClassObject(body)
+            ClassMetadata.TAG -> return ClassMetadata(body)
             InstanceObject.TAG -> return InstanceObject(body)
             ObjectArray.TAG -> return ObjectArray(body)
             PrimitiveArray.TAG -> return PrimitiveArray(body)

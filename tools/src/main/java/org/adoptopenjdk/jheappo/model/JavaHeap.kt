@@ -6,7 +6,7 @@ import org.adoptopenjdk.jheappo.io.LoadClass
 import org.adoptopenjdk.jheappo.io.StackFrame
 import org.adoptopenjdk.jheappo.io.StackTrace
 import org.adoptopenjdk.jheappo.io.UTF8StringSegment
-import org.adoptopenjdk.jheappo.objects.ClassObject
+import org.adoptopenjdk.jheappo.objects.ClassMetadata
 import org.adoptopenjdk.jheappo.objects.InstanceObject
 import org.adoptopenjdk.jheappo.objects.ObjectArray
 import org.adoptopenjdk.jheappo.objects.PrimitiveArray
@@ -26,7 +26,7 @@ import java.util.HashSet
 class JavaHeap(private val outputDir: Path) {
 
     internal var stringTable = HashMap<Long, UTF8String>()
-    internal var clazzTable = HashMap<Long, ClassObject>()
+    internal var clazzTable = HashMap<Long, ClassMetadata>()
     internal var oopTable = HashMap<Long, InstanceObject>()
     internal var loadClassTable = HashMap<Long, LoadClass>()
     internal var rootStickClass = HashSet<Long>()
@@ -57,7 +57,7 @@ class JavaHeap(private val outputDir: Path) {
                                 is UTF8StringSegment -> {
                                     val string = frame.toUtf8String()
                                     stringTable[string.id] = string
-                                    out.write(java.lang.Long.toString(string.id) + "->" + string.string + "\n")
+                                    out.write("${string.id}->${string.string}\n")
                                 }
                                 is LoadClass -> {
                                     loadClassTable[frame.classObjectID] = frame //store mapping of class to class name.
@@ -69,9 +69,11 @@ class JavaHeap(private val outputDir: Path) {
                                         println("parser error resolving type in HeapDumpSegment....")
                                         continue
                                     }
-                                    if (heapObject is ClassObject) {
+                                    if (heapObject is ClassMetadata) {
                                         clazzTable[heapObject.id] = heapObject
-                                        clazzFile.write(heapObject.toString() + "\n")
+                                        val loadClassRecord = loadClassTable[heapObject.id]
+                                        val className = stringTable[loadClassRecord?.classNameStringID]
+                                        clazzFile.write("$heapObject ${className?.string}\n")
                                     } else if (heapObject is InstanceObject) {
                                         val instanceObject = heapObject as InstanceObject?
                                         instanceObject!!.inflate(this.getClazzById(instanceObject.classObjectID))
@@ -105,7 +107,7 @@ class JavaHeap(private val outputDir: Path) {
         }
     }
 
-    fun getClazzById(cid: Long): ClassObject {
+    fun getClazzById(cid: Long): ClassMetadata {
         return clazzTable.getValue(cid)
     }
 

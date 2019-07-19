@@ -42,7 +42,7 @@ sealed class HeapObject(buffer: EncodedChunk) {
         11  | long
  */
 
-class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
+class ClassMetadata(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x20U
     }
@@ -59,7 +59,7 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
     internal lateinit var staticValues: Array<BasicDataTypeValue>
 
     lateinit var fieldNamesIndicies: LongArray
-    lateinit var fieldTypes: IntArray
+        lateinit var fieldTypes: List<FieldType>
 
     init {
         extractConstantPool(buffer)
@@ -77,7 +77,7 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
         val numberOfRecords = buffer.extractU2().toInt()
         for (i in 0 until numberOfRecords) {
             val constantPoolIndex = buffer.extractU2().toInt()
-            val value = buffer.extractBasicType(buffer.extractU1().toInt())
+            val value = buffer.extractBasicType(buffer.extractU1())
             println("Constant Pool: $constantPoolIndex:$value")
         }
     }
@@ -95,7 +95,7 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
 
         for (i in 0 until numberOfRecords) {
             staticFieldNameIndicies[i] = buffer.extractID()
-            values.add(buffer.extractBasicType(buffer.extractU1().toInt()))
+            values.add(buffer.extractBasicType(buffer.extractU1()))
         }
 
         staticValues = values.toTypedArray()
@@ -108,16 +108,15 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
      */
     private fun extractInstanceFields(buffer: EncodedChunk) {
         val numberOfInstanceFields = buffer.extractU2().toInt()
-        if (numberOfInstanceFields > -1) {
-            fieldNamesIndicies = LongArray(numberOfInstanceFields)
-            fieldTypes = IntArray(numberOfInstanceFields)
-        }
+        val types = mutableListOf<FieldType>()
+        fieldNamesIndicies = LongArray(numberOfInstanceFields)
         for (i in 0 until numberOfInstanceFields) {
             fieldNamesIndicies[i] = buffer.extractID()
             if (fieldNamesIndicies[i] < 1)
                 println("field name invalid id: " + fieldNamesIndicies[i])
-            fieldTypes[i] = buffer.extractU1().toInt()
+            types.add(buffer.extractU1().let { FieldType.fromInt(it) })
         }
+        fieldTypes = types.toList()
     }
 
     override fun toString(): String {
@@ -150,7 +149,7 @@ class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
     }
     val stackTraceSerialNumber: UInt
     val classObjectID: Long
-    var instanceFieldValues = arrayOf<BasicDataTypeValue>()
+    var instanceFieldValues = listOf<BasicDataTypeValue>()
 
     private var buffer: EncodedChunk? = null
 
@@ -162,12 +161,11 @@ class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
         this.buffer = EncodedChunk(buffer.read(bufferLength.toInt()))
     }
 
-    fun inflate(classObject: ClassObject) {
+    fun inflate(classMetadata: ClassMetadata) {
         val b = buffer ?: return
         if (!b.endOfBuffer()) {
-            instanceFieldValues = classObject.fieldTypes
+            instanceFieldValues = classMetadata.fieldTypes
                     .map { b.extractBasicType(it) }
-                    .toTypedArray()
         }
         buffer = null
     }
@@ -202,7 +200,7 @@ class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
     private val elements: Array<ObjectValue>
 
     init {
-        elements = (0U until size).map { buffer.extractBasicType(BasicDataTypes.OBJECT) }
+        elements = (0U until size).map { buffer.extractBasicType(FieldType.OBJECT) }
                 .map { it as ObjectValue }
                 .toTypedArray()
     }
@@ -233,11 +231,12 @@ class PrimitiveArray(buffer: EncodedChunk) : HeapObject(buffer) {
     internal val elements: Array<BasicDataTypeValue>
 
     init {
-        val dataType = BasicDataTypes.fromInt(elementType.toInt()) ?: BasicDataTypes.UNKNOWN
-        if (dataType == BasicDataTypes.UNKNOWN) {
+        // TODO decide what to do about unknown records
+        val dataType = FieldType.fromInt(elementType)
+        if (dataType == FieldType.UNKNOWN) {
             throw IllegalArgumentException("Unknown data type : $elementType")
         }
-        signature = BasicDataTypes.fromInt(elementType.toInt())!!.mnemonic
+        signature = dataType.mnemonic
         elements = (0U until size).map { buffer.extractBasicType(dataType) }.toTypedArray()
     }
 }
