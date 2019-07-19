@@ -150,7 +150,7 @@ class HeapDumpSegment internal constructor(private val body: EncodedChunk) : Hea
     }
 
     fun hasNext(): Boolean {
-        return body.endOfBuffer()
+        return !body.endOfBuffer()
     }
 
     fun next(): HeapObject? {

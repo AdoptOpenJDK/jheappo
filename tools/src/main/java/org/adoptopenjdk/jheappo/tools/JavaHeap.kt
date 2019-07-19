@@ -64,7 +64,7 @@ class JavaHeap(private val outputDir: Path) {
                                     loadClassTable[frame.classObjectID] = frame //store mapping of class to class name.
                                     out.write(frame.toString() + "\n")
                                 }
-                                is HeapDumpSegment -> while (!frame.hasNext()) {
+                                is HeapDumpSegment -> while (frame.hasNext()) {
                                     val heapObject = frame.next()
                                     if (heapObject == null) {
                                         println("parser error resolving type in HeapDumpSegment....")

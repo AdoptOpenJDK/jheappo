@@ -68,7 +68,7 @@ class HeapGraph(private val path: File) {
                     is LoadClass -> // loadClassTable.put(((LoadClass) frame).getClassObjectID(), (LoadClass) frame); //store mapping of class to class name.
                         // out.write(frame.toString() + "\n");
                         clazzNames[frame.classObjectID] = frame.classNameStringID
-                    is HeapDumpSegment -> while (!frame.hasNext()) {
+                    is HeapDumpSegment -> while (frame.hasNext()) {
                         val heapObject = frame.next()
                         if (heapObject == null) {
                             println("parser error resolving type in HeapDumpSegment....")
