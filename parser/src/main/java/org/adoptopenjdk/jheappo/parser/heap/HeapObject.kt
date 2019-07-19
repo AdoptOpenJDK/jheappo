@@ -5,6 +5,8 @@ import org.adoptopenjdk.jheappo.parser.BasicDataTypeValue
 import org.adoptopenjdk.jheappo.parser.FieldType
 import org.adoptopenjdk.jheappo.parser.Id
 import org.adoptopenjdk.jheappo.parser.ObjectValue
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 sealed class HeapObject(buffer: EncodedChunk) {
     val id: Id = buffer.extractID()
@@ -46,6 +48,7 @@ sealed class HeapObject(buffer: EncodedChunk) {
 
 class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
+        private val logger: Logger = LoggerFactory.getLogger(ClassMetadata::class.java)
         const val TAG: UByte = 0x20U
     }
 
@@ -77,7 +80,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
         for (i in 0 until numberOfRecords) {
             val constantPoolIndex = buffer.extractU2().toInt()
             val value = buffer.extractBasicType(FieldType.fromInt(buffer.extractU1()))
-            println("Constant Pool: $constantPoolIndex:$value")
+            logger.debug("Constant Pool: $constantPoolIndex:$value")
         }
     }
 
@@ -111,7 +114,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
         for (i in 0 until numberOfInstanceFields) {
             val id = buffer.extractID()
             if (id.id < 1u) {
-                println("field name invalid id: $id")
+                logger.warn("field name invalid id: $id")
             }
             val type = (buffer.extractU1().let { FieldType.fromInt(it) })
             fields.add(FieldWithTypeMetadata(id, type))

@@ -15,6 +15,8 @@ import org.adoptopenjdk.jheappo.parser.heap.RootThreadBlock
 import org.adoptopenjdk.jheappo.parser.heap.RootThreadObject
 import org.adoptopenjdk.jheappo.parser.heap.RootUnknown
 import org.adoptopenjdk.jheappo.parser.heap.UTF8String
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -141,6 +143,8 @@ class HeapDumpSegment internal constructor(private val body: EncodedChunk) : Hea
     */
 
     companion object {
+        private val logger: Logger = LoggerFactory.getLogger(HeapDumpSegment::class.java)
+
         const val TAG1: UByte = 0x0CU
         const val TAG2: UByte = 0x1CU
     }
@@ -165,7 +169,7 @@ class HeapDumpSegment internal constructor(private val body: EncodedChunk) : Hea
             ObjectArray.TAG -> return ObjectArray(body)
             PrimitiveArray.TAG -> return PrimitiveArray(body)
             else -> {
-                println(typeCode.toString() + " not recognized... @index=" + body.index)
+                logger.warn(typeCode.toString() + " not recognized... @index=" + body.index)
                 return null
             }
         }

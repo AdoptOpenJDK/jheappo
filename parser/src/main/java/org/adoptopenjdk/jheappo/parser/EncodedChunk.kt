@@ -144,13 +144,13 @@ internal class EncodedChunk private constructor(private val body: ByteArray, ind
     fun dump(out: PrintStream) {
         val max = if (body.size > 1000) 1000 else body.size
         for (cursor in 0 until max) {
-            print(Integer.toHexString(body[cursor].toInt() and 255))
-            print(" ")
+            out.print(Integer.toHexString(body[cursor].toInt() and 255))
+            out.print(" ")
         }
         out.println("")
         for (cursor in 0 until max) {
-            print((body[cursor].toInt() and 255).toChar())
-            print(" ")
+            out.print((body[cursor].toInt() and 255).toChar())
+            out.print(" ")
         }
         out.println("")
     }
