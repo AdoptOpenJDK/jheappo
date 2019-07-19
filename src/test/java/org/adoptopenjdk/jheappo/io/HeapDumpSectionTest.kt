@@ -1,6 +1,5 @@
 package org.adoptopenjdk.jheappo.io
 
-import org.adoptopenjdk.jheappo.heapdump.EncodedChunk
 import org.junit.Test
 
 import junit.framework.TestCase.assertEquals

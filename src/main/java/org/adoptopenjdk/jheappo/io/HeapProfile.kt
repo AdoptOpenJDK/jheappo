@@ -7,8 +7,6 @@ package org.adoptopenjdk.jheappo.io
  */
 
 
-import org.adoptopenjdk.jheappo.heapdump.*
-
 import java.io.*
 import java.nio.file.Path
 

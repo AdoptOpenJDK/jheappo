@@ -1,14 +1,24 @@
 package org.adoptopenjdk.jheappo.model
 
-import org.adoptopenjdk.jheappo.heapdump.*
+import org.adoptopenjdk.jheappo.io.HeapDumpSegment
 import org.adoptopenjdk.jheappo.io.HeapProfile
-import org.adoptopenjdk.jheappo.io.HeapProfileRecord
-import org.adoptopenjdk.jheappo.io.HeapProfileHeader
-import org.adoptopenjdk.jheappo.objects.*
-
+import org.adoptopenjdk.jheappo.io.LoadClass
+import org.adoptopenjdk.jheappo.io.StackFrame
+import org.adoptopenjdk.jheappo.io.StackTrace
+import org.adoptopenjdk.jheappo.io.UTF8StringSegment
+import org.adoptopenjdk.jheappo.objects.ClassObject
+import org.adoptopenjdk.jheappo.objects.InstanceObject
+import org.adoptopenjdk.jheappo.objects.ObjectArray
+import org.adoptopenjdk.jheappo.objects.PrimitiveArray
+import org.adoptopenjdk.jheappo.objects.RootJNIGlobal
+import org.adoptopenjdk.jheappo.objects.RootJNILocal
+import org.adoptopenjdk.jheappo.objects.RootJavaFrame
+import org.adoptopenjdk.jheappo.objects.RootMonitorUsed
+import org.adoptopenjdk.jheappo.objects.RootStickyClass
+import org.adoptopenjdk.jheappo.objects.RootThreadObject
+import org.adoptopenjdk.jheappo.objects.UTF8String
 import java.io.BufferedWriter
 import java.io.FileWriter
-import java.io.IOException
 import java.io.PrintStream
 import java.util.HashMap
 import java.util.HashSet

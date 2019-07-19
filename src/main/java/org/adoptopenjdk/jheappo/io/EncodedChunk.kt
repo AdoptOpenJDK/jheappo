@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.heapdump
+package org.adoptopenjdk.jheappo.io
 
 import java.io.PrintStream
 import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
