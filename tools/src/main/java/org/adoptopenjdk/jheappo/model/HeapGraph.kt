@@ -19,6 +19,7 @@ import org.adoptopenjdk.jheappo.heap.PrimitiveArray
 import org.adoptopenjdk.jheappo.heap.RootJavaFrame
 import org.adoptopenjdk.jheappo.heap.RootThreadObject
 import org.adoptopenjdk.jheappo.heap.UTF8String
+import org.adoptopenjdk.jheappo.io.Id
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.graphdb.Node
 import org.neo4j.graphdb.Transaction
@@ -30,12 +31,12 @@ import java.util.HashMap
 import java.util.HashSet
 
 class HeapGraph(private val path: File) {
-    internal var stringTable = HashMap<Long, UTF8String>()
-    internal var clazzTable = HashMap<Long, ClassMetadata>()
-    internal var clazzNodes = HashMap<Long, Node>()
-    internal var clazzNames = HashMap<Long, Long>()
-    internal var instanceNodes = HashMap<Long, Node>()
-    internal var oopTable = HashMap<Long, InstanceObject>()
+    internal var stringTable = HashMap<Id, UTF8String>()
+    internal var clazzTable = HashMap<Id, ClassMetadata>()
+    internal var clazzNodes = HashMap<Id, Node>()
+    internal var clazzNames = HashMap<Id, Id>()
+    internal var instanceNodes = HashMap<Id, Node>()
+    internal var oopTable = HashMap<Id, InstanceObject>()
     internal var loadClassTable = HashMap<Long, LoadClass>()
     internal var rootStickClass = HashSet<Long>()
     internal var rootJNIGlobal = HashMap<Long, Long>()
@@ -185,15 +186,15 @@ class HeapGraph(private val path: File) {
         }
     }
 
-    private fun className(id: Long): String {
+    private fun className(id: Id): String {
         return stringTable[clazzNames[id]]!!.string
     }
 
-    private fun fieldName(index: Long): String {
+    private fun fieldName(index: Id): String {
         return "_" + stringTable[index]!!.string
     }
 
-    private fun mergeNode(db: GraphDatabaseService, cache: HashMap<Long, Node>, type: Labels, objectId: Long): Node {
+    private fun mergeNode(db: GraphDatabaseService, cache: HashMap<Id, Node>, type: Labels, objectId: Id): Node {
         return cache.computeIfAbsent(objectId) { id ->
             val n = db.createNode(type)
             n.setProperty("id", id)
@@ -210,7 +211,7 @@ class HeapGraph(private val path: File) {
         }
     }
 
-    fun getClazzById(cid: Long): ClassMetadata {
+    fun getClazzById(cid: Id): ClassMetadata {
         return clazzTable.getValue(cid)
     }
 
@@ -222,7 +223,7 @@ class HeapGraph(private val path: File) {
         oopTable[instanceObject.id] = instanceObject
     }
 
-    fun getInstanceObject(id: Long): InstanceObject {
+    fun getInstanceObject(id: Id): InstanceObject {
         return oopTable.getValue(id)
     }
 

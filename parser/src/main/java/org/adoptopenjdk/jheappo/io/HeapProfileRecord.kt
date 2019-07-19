@@ -192,9 +192,9 @@ class LoadClass internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     }
 
     val classSerialNumber: Long = body.extractU4().toLong()
-    val classObjectID: Long = body.extractID()
+    val classObjectID: Id = body.extractID()
     val stackTraceSerialNumber: Long = body.extractU4().toLong()
-    val classNameStringID: Long = body.extractID()
+    val classNameStringID: Id = body.extractID()
 
     override fun toString(): String {
         return "Loaded -> $classSerialNumber:$classObjectID:$stackTraceSerialNumber:$classNameStringID"
@@ -219,12 +219,12 @@ class StackFrame internal constructor(body: EncodedChunk) : HeapProfileRecord() 
         const val TAG: UByte = 0x04U
     }
 
-    internal val stackFrameID: Long = body.extractID()
-    internal val methodNameStringID: Long = body.extractID()
-    internal val methodSignatureStringID: Long = body.extractID()
-    internal val sourceFileNameStringID: Long = body.extractID()
+    internal val stackFrameID: Id = body.extractID()
+    internal val methodNameStringID: Id = body.extractID()
+    internal val methodSignatureStringID: Id = body.extractID()
+    internal val sourceFileNameStringID: Id = body.extractID()
 
-    internal val classSerialNumber: Long = body.extractID()
+    internal val classSerialNumber: Id = body.extractID()
 
     override fun toString(): String {
         return "StackFrame --> $stackFrameID:$methodNameStringID:$methodSignatureStringID:$sourceFileNameStringID:$classSerialNumber"
@@ -248,10 +248,10 @@ class StackTrace internal constructor(body: EncodedChunk) : HeapProfileRecord() 
     internal val threadSerialNumber: UInt = body.extractU4()
     internal val numberOfFrames: UInt = body.extractU4()
 
-    internal val stackFrameIDs: LongArray
+    internal val stackFrameIDs: Array<Id>
 
     init {
-        stackFrameIDs = LongArray(numberOfFrames.toInt())
+        stackFrameIDs = Array(numberOfFrames.toInt()) { Id(1u) }
         for (i in 0 until numberOfFrames.toInt()) {
             stackFrameIDs[i] = body.extractID()
         }

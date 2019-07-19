@@ -75,9 +75,9 @@ internal class EncodedChunk private constructor(private val body: ByteArray, ind
         return value
     }
 
-    fun extractID(): Long {
+    fun extractID(): Id {
         // TODO what if identifiers are 4 bytes?
-        return extractU8().toLong()
+        return Id(extractU8())
     }
 
     private fun extractBoolean(): Boolean {
@@ -155,4 +155,9 @@ internal class EncodedChunk private constructor(private val body: ByteArray, ind
         out.println("")
     }
 
+}
+
+// eventually, a sealed class hierarchy for different id sizes
+data class Id(val id: ULong) {
+    override fun toString(): String = id.toString()
 }

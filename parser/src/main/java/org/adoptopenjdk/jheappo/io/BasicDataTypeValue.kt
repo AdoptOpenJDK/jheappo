@@ -8,7 +8,7 @@ sealed class BasicDataTypeValue(val type: FieldType) {
     abstract override fun toString(): String
 }
 
-class ObjectValue(val objectId: Long) : BasicDataTypeValue(FieldType.OBJECT) {
+class ObjectValue(val objectId: Id) : BasicDataTypeValue(FieldType.OBJECT) {
     override fun toString(): String = "$objectId of type $type"
 }
 

@@ -17,6 +17,7 @@ import org.adoptopenjdk.jheappo.heap.RootMonitorUsed
 import org.adoptopenjdk.jheappo.heap.RootStickyClass
 import org.adoptopenjdk.jheappo.heap.RootThreadObject
 import org.adoptopenjdk.jheappo.heap.UTF8String
+import org.adoptopenjdk.jheappo.io.Id
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -25,18 +26,18 @@ import java.util.HashSet
 
 class JavaHeap(private val outputDir: Path) {
 
-    internal var stringTable = HashMap<Long, UTF8String>()
-    internal var clazzTable = HashMap<Long, ClassMetadata>()
-    internal var oopTable = HashMap<Long, InstanceObject>()
-    internal var loadClassTable = HashMap<Long, LoadClass>()
-    internal var rootStickClass = HashSet<Long>()
-    internal var rootJNIGlobal = HashMap<Long, Long>()
-    internal var rootJNILocal = HashMap<Long, Long>()
-    internal var rootMonitorUsed = HashSet<Long>()
-    internal var rootJavaFrame = HashMap<Long, RootJavaFrame>()
-    internal var rootThreadObject = HashMap<Long, RootThreadObject>()
-    internal var primitiveArray = HashMap<Long, PrimitiveArray>()
-    internal var objectArray = HashMap<Long, ObjectArray>()
+    internal var stringTable = HashMap<Id, UTF8String>()
+    internal var clazzTable = HashMap<Id, ClassMetadata>()
+    internal var oopTable = HashMap<Id, InstanceObject>()
+    internal var loadClassTable = HashMap<Id, LoadClass>()
+    internal var rootStickClass = HashSet<Id>()
+    internal var rootJNIGlobal = HashMap<Id, Id>()
+    internal var rootJNILocal = HashMap<Id, Id>()
+    internal var rootMonitorUsed = HashSet<Id>()
+    internal var rootJavaFrame = HashMap<Id, RootJavaFrame>()
+    internal var rootThreadObject = HashMap<Id, RootThreadObject>()
+    internal var primitiveArray = HashMap<Id, PrimitiveArray>()
+    internal var objectArray = HashMap<Id, ObjectArray>()
 
     fun populateFrom(heapDump: HeapProfile) {
         Files.newBufferedWriter(outputDir.resolve("string.table")).use { out ->
@@ -107,7 +108,7 @@ class JavaHeap(private val outputDir: Path) {
         }
     }
 
-    fun getClazzById(cid: Long): ClassMetadata {
+    fun getClazzById(cid: Id): ClassMetadata {
         return clazzTable.getValue(cid)
     }
 
@@ -119,7 +120,7 @@ class JavaHeap(private val outputDir: Path) {
         oopTable[instanceObject.id] = instanceObject
     }
 
-    fun getInstanceObject(id: Long): InstanceObject {
+    fun getInstanceObject(id: Id): InstanceObject {
         return oopTable.getValue(id)
     }
 }

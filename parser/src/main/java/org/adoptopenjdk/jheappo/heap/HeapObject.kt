@@ -3,10 +3,11 @@ package org.adoptopenjdk.jheappo.heap
 import org.adoptopenjdk.jheappo.io.EncodedChunk
 import org.adoptopenjdk.jheappo.io.BasicDataTypeValue
 import org.adoptopenjdk.jheappo.io.FieldType
+import org.adoptopenjdk.jheappo.io.Id
 import org.adoptopenjdk.jheappo.io.ObjectValue
 
 sealed class HeapObject(buffer: EncodedChunk) {
-    val id: Long = buffer.extractID()
+    val id: Id = buffer.extractID()
 }
 
 /*
@@ -49,17 +50,17 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
     }
 
     internal val stackTraceSerialNumber: UInt = buffer.extractU4()
-    val superClassObjectID: Long = buffer.extractID()
-    internal val classLoaderObjectID: Long = buffer.extractID()
-    internal val signersObjectID: Long = buffer.extractID()
-    internal val protectionDomainObjectID: Long = buffer.extractID()
+    val superClassObjectID: Id = buffer.extractID()
+    internal val classLoaderObjectID: Id = buffer.extractID()
+    internal val signersObjectID: Id = buffer.extractID()
+    internal val protectionDomainObjectID: Id = buffer.extractID()
     internal val reserved = arrayOf(buffer.extractID(), buffer.extractID())
     val instanceSizeInBytes: UInt = buffer.extractU4()
 
-    internal lateinit var staticFieldNameIndicies: LongArray
+    internal lateinit var staticFieldNameIndicies: Array<Id>
     internal lateinit var staticValues: Array<BasicDataTypeValue>
 
-    lateinit var fieldNamesIndicies: LongArray
+    lateinit var fieldNamesIndicies: Array<Id>
     lateinit var fieldTypes: List<FieldType>
 
     init {
@@ -91,7 +92,8 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
      */
     private fun extractStaticFields(buffer: EncodedChunk) {
         val numberOfRecords = buffer.extractU2().toInt()
-        staticFieldNameIndicies = LongArray(numberOfRecords)
+        // TODO don't require an array here
+        staticFieldNameIndicies = Array(numberOfRecords) { Id(1u) }
         val values = ArrayList<BasicDataTypeValue>(numberOfRecords)
 
         for (i in 0 until numberOfRecords) {
@@ -110,11 +112,12 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
     private fun extractInstanceFields(buffer: EncodedChunk) {
         val numberOfInstanceFields = buffer.extractU2().toInt()
         val types = mutableListOf<FieldType>()
-        fieldNamesIndicies = LongArray(numberOfInstanceFields)
+        fieldNamesIndicies = Array(numberOfInstanceFields) { Id(1u) }
         for (i in 0 until numberOfInstanceFields) {
             fieldNamesIndicies[i] = buffer.extractID()
-            if (fieldNamesIndicies[i] < 1)
+            if (fieldNamesIndicies[i].id < 1u) {
                 println("field name invalid id: " + fieldNamesIndicies[i])
+            }
             types.add(buffer.extractU1().let { FieldType.fromInt(it) })
         }
         fieldTypes = types.toList()
@@ -150,7 +153,7 @@ class InstanceObject internal constructor(buffer: EncodedChunk) : HeapObject(buf
     }
 
     val stackTraceSerialNumber: UInt
-    val classObjectID: Long
+    val classObjectID: Id
     var instanceFieldValues = listOf<BasicDataTypeValue>()
 
     private var buffer: EncodedChunk? = null
@@ -197,7 +200,7 @@ class ObjectArray internal constructor(buffer: EncodedChunk) : HeapObject(buffer
 
     private val stackTraceSerialNumber: UInt = buffer.extractU4()
     val size: UInt = buffer.extractU4()
-    private val elementsObjectID: Long = buffer.extractID()
+    private val elementsObjectID: Id = buffer.extractID()
 
     private val elements: Array<ObjectValue>
 
@@ -207,7 +210,7 @@ class ObjectArray internal constructor(buffer: EncodedChunk) : HeapObject(buffer
                 .toTypedArray()
     }
 
-    fun getValueObjectIDAt(index: Int): Long {
+    fun getValueObjectIDAt(index: Int): Id {
         return elements[index].objectId
     }
 }
@@ -265,7 +268,7 @@ class RootJNIGlobal internal constructor(buffer: EncodedChunk) : HeapObject(buff
         const val TAG: UByte = 0x01U
     }
 
-    val jniGlobalRefID: Long = buffer.extractID()
+    val jniGlobalRefID: Id = buffer.extractID()
 
     override fun toString(): String {
         return "RootJNIGlobal : $id:$jniGlobalRefID"
