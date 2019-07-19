@@ -1,7 +1,7 @@
 package org.adoptopenjdk.jheappo.parser.heap
 
-import org.adoptopenjdk.jheappo.parser.EncodedChunk
 import org.adoptopenjdk.jheappo.parser.BasicDataTypeValue
+import org.adoptopenjdk.jheappo.parser.EncodedChunk
 import org.adoptopenjdk.jheappo.parser.FieldType
 import org.adoptopenjdk.jheappo.parser.Id
 import org.adoptopenjdk.jheappo.parser.ObjectValue
@@ -233,7 +233,7 @@ class PrimitiveArray internal constructor(buffer: EncodedChunk) : HeapObject(buf
     private val elementType: UByte = buffer.extractU1()
     private val signature: Char
 
-    internal val elements: Array<BasicDataTypeValue>
+    internal val elements: PrimitiveArrayWrapper
 
     init {
         // TODO decide what to do about unknown records
@@ -242,7 +242,7 @@ class PrimitiveArray internal constructor(buffer: EncodedChunk) : HeapObject(buf
             throw IllegalArgumentException("Unknown data type : $elementType")
         }
         signature = dataType.mnemonic
-        elements = (0U until size).map { buffer.extractBasicType(dataType) }.toTypedArray()
+        elements = buffer.extractPrimitiveArray(dataType, size)
     }
 }
 

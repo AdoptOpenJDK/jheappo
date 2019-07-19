@@ -1,5 +1,14 @@
 package org.adoptopenjdk.jheappo.parser
 
+import org.adoptopenjdk.jheappo.parser.heap.BooleanArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.ByteArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.CharArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.DoubleArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.FloatArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.IntArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.LongArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.PrimitiveArrayWrapper
+import org.adoptopenjdk.jheappo.parser.heap.ShortArrayWrapper
 import java.io.PrintStream
 
 /**
@@ -126,6 +135,54 @@ internal class EncodedChunk private constructor(private val body: ByteArray, ind
             FieldType.LONG -> LongValue(this.extractLong())
             FieldType.ARRAY -> ArrayValue
             FieldType.UNKNOWN -> UnknownValue
+        }
+    }
+
+    fun extractPrimitiveArray(type: FieldType, size: UInt): PrimitiveArrayWrapper {
+        val sizeInt = size.toInt()
+        return when (type) {
+            FieldType.ARRAY, FieldType.OBJECT, FieldType.UNKNOWN -> throw IllegalArgumentException(
+                    "Must be a primitive type")
+            FieldType.BOOLEAN -> {
+                val arr = BooleanArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractBoolean() }
+                BooleanArrayWrapper(arr)
+            }
+            FieldType.CHAR -> {
+                val arr = CharArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractChar() }
+                CharArrayWrapper(arr)
+            }
+            FieldType.FLOAT -> {
+                val arr = FloatArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractFloat() }
+                FloatArrayWrapper(arr)
+            }
+            FieldType.DOUBLE -> {
+                val arr = DoubleArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractDouble() }
+                DoubleArrayWrapper(arr)
+            }
+            FieldType.BYTE -> {
+                val arr = ByteArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractByte() }
+                ByteArrayWrapper(arr)
+            }
+            FieldType.SHORT -> {
+                val arr = ShortArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractShort() }
+                ShortArrayWrapper(arr)
+            }
+            FieldType.INT -> {
+                val arr = IntArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractInt() }
+                IntArrayWrapper(arr)
+            }
+            FieldType.LONG -> {
+                val arr = LongArray(size.toInt())
+                (0 until sizeInt).forEach { arr[it] = extractLong() }
+                LongArrayWrapper(arr)
+            }
         }
     }
 
