@@ -16,7 +16,7 @@
     </prerequisites>
 
     <modules>
-        <module>core</module>
+        <module>parser</module>
         <module>tools</module>
     </modules>
 
