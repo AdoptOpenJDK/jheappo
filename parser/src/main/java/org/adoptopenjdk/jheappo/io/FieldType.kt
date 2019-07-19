@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.objects
+package org.adoptopenjdk.jheappo.io
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.

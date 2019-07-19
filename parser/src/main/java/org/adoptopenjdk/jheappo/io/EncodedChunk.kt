@@ -1,18 +1,5 @@
 package org.adoptopenjdk.jheappo.io
 
-import org.adoptopenjdk.jheappo.model.ArrayValue
-import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
-import org.adoptopenjdk.jheappo.model.BooleanValue
-import org.adoptopenjdk.jheappo.model.ByteValue
-import org.adoptopenjdk.jheappo.model.CharValue
-import org.adoptopenjdk.jheappo.model.DoubleValue
-import org.adoptopenjdk.jheappo.model.FloatValue
-import org.adoptopenjdk.jheappo.model.IntValue
-import org.adoptopenjdk.jheappo.model.LongValue
-import org.adoptopenjdk.jheappo.model.ObjectValue
-import org.adoptopenjdk.jheappo.model.ShortValue
-import org.adoptopenjdk.jheappo.model.UnknownValue
-import org.adoptopenjdk.jheappo.objects.FieldType
 import java.io.PrintStream
 
 /**
@@ -140,10 +127,6 @@ internal class EncodedChunk private constructor(private val body: ByteArray, ind
             FieldType.ARRAY -> ArrayValue
             FieldType.UNKNOWN -> UnknownValue
         }
-    }
-
-    fun extractBasicType(basicType: UByte): BasicDataTypeValue {
-        return extractBasicType(FieldType.fromInt(basicType))
     }
 
     /**

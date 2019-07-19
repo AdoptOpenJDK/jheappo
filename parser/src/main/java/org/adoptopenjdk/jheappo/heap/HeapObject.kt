@@ -1,8 +1,9 @@
-package org.adoptopenjdk.jheappo.objects
+package org.adoptopenjdk.jheappo.heap
 
 import org.adoptopenjdk.jheappo.io.EncodedChunk
-import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
-import org.adoptopenjdk.jheappo.model.ObjectValue
+import org.adoptopenjdk.jheappo.io.BasicDataTypeValue
+import org.adoptopenjdk.jheappo.io.FieldType
+import org.adoptopenjdk.jheappo.io.ObjectValue
 
 sealed class HeapObject(buffer: EncodedChunk) {
     val id: Long = buffer.extractID()
@@ -59,7 +60,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
     internal lateinit var staticValues: Array<BasicDataTypeValue>
 
     lateinit var fieldNamesIndicies: LongArray
-        lateinit var fieldTypes: List<FieldType>
+    lateinit var fieldTypes: List<FieldType>
 
     init {
         extractConstantPool(buffer)
@@ -77,7 +78,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
         val numberOfRecords = buffer.extractU2().toInt()
         for (i in 0 until numberOfRecords) {
             val constantPoolIndex = buffer.extractU2().toInt()
-            val value = buffer.extractBasicType(buffer.extractU1())
+            val value = buffer.extractBasicType(FieldType.fromInt(buffer.extractU1()))
             println("Constant Pool: $constantPoolIndex:$value")
         }
     }
@@ -95,7 +96,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
 
         for (i in 0 until numberOfRecords) {
             staticFieldNameIndicies[i] = buffer.extractID()
-            values.add(buffer.extractBasicType(buffer.extractU1()))
+            values.add(buffer.extractBasicType(FieldType.fromInt(buffer.extractU1())))
         }
 
         staticValues = values.toTypedArray()
@@ -147,6 +148,7 @@ class InstanceObject internal constructor(buffer: EncodedChunk) : HeapObject(buf
     companion object {
         const val TAG: UByte = 0x21U
     }
+
     val stackTraceSerialNumber: UInt
     val classObjectID: Long
     var instanceFieldValues = listOf<BasicDataTypeValue>()

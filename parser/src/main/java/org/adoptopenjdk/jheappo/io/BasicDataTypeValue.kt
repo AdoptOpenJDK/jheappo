@@ -1,7 +1,9 @@
-package org.adoptopenjdk.jheappo.model
+package org.adoptopenjdk.jheappo.io
 
-import org.adoptopenjdk.jheappo.objects.FieldType
-
+/**
+ * A lightweight representation of a value used in in arrays, field lists, etc. For primitives, the actual value is
+ * exposed.
+ */
 sealed class BasicDataTypeValue(val type: FieldType) {
     abstract override fun toString(): String
 }
