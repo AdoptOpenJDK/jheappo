@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.model
+package org.adoptopenjdk.jheappo.tools
 
 import org.adoptopenjdk.jheappo.parser.HeapDumpSegment
 import org.adoptopenjdk.jheappo.parser.HeapProfile

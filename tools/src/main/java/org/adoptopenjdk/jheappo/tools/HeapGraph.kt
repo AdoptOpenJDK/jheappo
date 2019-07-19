@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.model
+package org.adoptopenjdk.jheappo.tools
 
 import org.adoptopenjdk.jheappo.parser.ArrayValue
 import org.adoptopenjdk.jheappo.parser.HeapDumpSegment
@@ -10,8 +10,8 @@ import org.adoptopenjdk.jheappo.parser.StackFrame
 import org.adoptopenjdk.jheappo.parser.StackTrace
 import org.adoptopenjdk.jheappo.parser.UTF8StringSegment
 import org.adoptopenjdk.jheappo.parser.UnknownValue
-import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Labels
-import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Relationships
+import org.adoptopenjdk.jheappo.tools.HeapGraphExtras.Labels
+import org.adoptopenjdk.jheappo.tools.HeapGraphExtras.Relationships
 import org.adoptopenjdk.jheappo.parser.heap.ClassMetadata
 import org.adoptopenjdk.jheappo.parser.heap.InstanceObject
 import org.adoptopenjdk.jheappo.parser.heap.ObjectArray

@@ -70,7 +70,7 @@
                                 <transformer
                                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>org.adoptopenjdk.jheappo.Heappo</Main-Class>
+                                        <Main-Class>org.adoptopenjdk.jheappo.tools.Heappo</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>

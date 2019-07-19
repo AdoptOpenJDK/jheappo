@@ -1,7 +1,7 @@
 package org.adoptopenjdk.jheappo.heaptextoutput
 
 import org.adoptopenjdk.jheappo.parser.HeapProfile
-import org.adoptopenjdk.jheappo.model.JavaHeap
+import org.adoptopenjdk.jheappo.tools.JavaHeap
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir

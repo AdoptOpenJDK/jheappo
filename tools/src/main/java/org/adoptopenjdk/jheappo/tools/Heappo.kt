@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo
+package org.adoptopenjdk.jheappo.tools
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -7,8 +7,6 @@ package org.adoptopenjdk.jheappo
  */
 
 import org.adoptopenjdk.jheappo.parser.HeapProfile
-import org.adoptopenjdk.jheappo.model.HeapGraph
-import org.adoptopenjdk.jheappo.model.JavaHeap
 
 import java.io.File
 import java.io.FileInputStream
