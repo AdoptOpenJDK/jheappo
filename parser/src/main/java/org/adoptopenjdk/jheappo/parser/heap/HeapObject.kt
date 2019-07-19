@@ -97,7 +97,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
         for (i in 0 until numberOfRecords) {
             val id = buffer.extractID()
             val value = buffer.extractBasicType(FieldType.fromInt(buffer.extractU1()))
-            fields.add(FieldWithValueMetadata(id, value))
+            fields[i] = FieldWithValueMetadata(id, value)
         }
 
         return fields.requireNoNulls().toList()
@@ -117,7 +117,7 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
                 logger.warn("field name invalid id: $id")
             }
             val type = (buffer.extractU1().let { FieldType.fromInt(it) })
-            fields.add(FieldWithTypeMetadata(id, type))
+            fields[i] = FieldWithTypeMetadata(id, type)
         }
         return fields.requireNoNulls().toList()
     }
