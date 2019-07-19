@@ -57,16 +57,13 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
     internal val reserved = arrayOf(buffer.extractID(), buffer.extractID())
     val instanceSizeInBytes: UInt = buffer.extractU4()
 
-    internal lateinit var staticFieldNameIndicies: Array<Id>
-    internal lateinit var staticValues: Array<BasicDataTypeValue>
-
-    lateinit var fieldNamesIndicies: Array<Id>
-    lateinit var fieldTypes: List<FieldType>
+    internal val staticFields: List<FieldWithValueMetadata>
+    val instanceFields: List<FieldWithTypeMetadata>
 
     init {
         extractConstantPool(buffer)
-        extractStaticFields(buffer)
-        extractInstanceFields(buffer)
+        staticFields = extractStaticFields(buffer)
+        instanceFields = extractInstanceFields(buffer)
     }
 
     /*
@@ -90,18 +87,17 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
               | u1    | type of field: (See Basic Type)
               | value | value of entry (u1, u2, u4, or u8 based on type of field)
      */
-    private fun extractStaticFields(buffer: EncodedChunk) {
+    private fun extractStaticFields(buffer: EncodedChunk): List<FieldWithValueMetadata> {
         val numberOfRecords = buffer.extractU2().toInt()
-        // TODO don't require an array here
-        staticFieldNameIndicies = Array(numberOfRecords) { Id(1u) }
-        val values = ArrayList<BasicDataTypeValue>(numberOfRecords)
-
+        // create correct sized list filled with nulls to avoid resize allocation
+        val fields = MutableList<FieldWithValueMetadata?>(numberOfRecords) { null }
         for (i in 0 until numberOfRecords) {
-            staticFieldNameIndicies[i] = buffer.extractID()
-            values.add(buffer.extractBasicType(FieldType.fromInt(buffer.extractU1())))
+            val id = buffer.extractID()
+            val value = buffer.extractBasicType(FieldType.fromInt(buffer.extractU1()))
+            fields.add(FieldWithValueMetadata(id, value))
         }
 
-        staticValues = values.toTypedArray()
+        return fields.requireNoNulls().toList()
     }
 
     /*
@@ -109,24 +105,24 @@ class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buff
               | ID    | field name string ID
               | u1    | type of field: (See Basic Type)
      */
-    private fun extractInstanceFields(buffer: EncodedChunk) {
+    private fun extractInstanceFields(buffer: EncodedChunk): List<FieldWithTypeMetadata> {
         val numberOfInstanceFields = buffer.extractU2().toInt()
-        val types = mutableListOf<FieldType>()
-        fieldNamesIndicies = Array(numberOfInstanceFields) { Id(1u) }
+        val fields = MutableList<FieldWithTypeMetadata?>(numberOfInstanceFields) { null }
         for (i in 0 until numberOfInstanceFields) {
-            fieldNamesIndicies[i] = buffer.extractID()
-            if (fieldNamesIndicies[i].id < 1u) {
-                println("field name invalid id: " + fieldNamesIndicies[i])
+            val id = buffer.extractID()
+            if (id.id < 1u) {
+                println("field name invalid id: $id")
             }
-            types.add(buffer.extractU1().let { FieldType.fromInt(it) })
+            val type = (buffer.extractU1().let { FieldType.fromInt(it) })
+            fields.add(FieldWithTypeMetadata(id, type))
         }
-        fieldTypes = types.toList()
+        return fields.requireNoNulls().toList()
     }
 
     override fun toString(): String {
         var fields = ", Fields --> "
-        for (i in fieldNamesIndicies.indices) {
-            fields += ", " + fieldNamesIndicies[i]
+        for (fm in instanceFields) {
+            fields += ", ${fm.nameId}"
         }
 
         return "Class Object -->" + id +
@@ -169,8 +165,9 @@ class InstanceObject internal constructor(buffer: EncodedChunk) : HeapObject(buf
     fun inflate(classMetadata: ClassMetadata) {
         val b = buffer ?: return
         if (!b.endOfBuffer()) {
-            instanceFieldValues = classMetadata.fieldTypes
-                    .map { b.extractBasicType(it) }
+            // TODO handle superclass fields
+            instanceFieldValues = classMetadata.instanceFields
+                    .map { b.extractBasicType(it.type) }
         }
         buffer = null
     }
@@ -362,3 +359,6 @@ class UTF8String internal constructor(buffer: EncodedChunk) : HeapObject(buffer)
         return "$id : $string"
     }
 }
+
+class FieldWithValueMetadata(val nameId: Id, val value: BasicDataTypeValue)
+class FieldWithTypeMetadata(val nameId: Id, val type: FieldType)

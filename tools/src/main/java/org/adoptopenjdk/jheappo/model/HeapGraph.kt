@@ -82,11 +82,8 @@ class HeapGraph(private val path: File) {
                                 count++
                                 node.setProperty("name", className(heapObject.id))
                                 node.setProperty("size", heapObject.instanceSizeInBytes)
-                                for (i in 0 until heapObject.fieldNamesIndicies.size) {
-                                    val index = heapObject.fieldNamesIndicies[i]
-                                    val type = heapObject.fieldTypes[i]
-                                    // todo string resolution
-                                    node.setProperty(fieldName(index), type)
+                                heapObject.instanceFields.forEach { field ->
+                                    node.setProperty(fieldName(field.nameId), field.type)
                                 }
                                 val parent = mergeNode(db, clazzNodes, Labels.Class, heapObject.superClassObjectID)
                                 count++
@@ -105,18 +102,17 @@ class HeapGraph(private val path: File) {
                                 count++
                                 node.createRelationshipTo(classNode, Relationships.IS_CLASS)
                                 count++
-                                for (i in 0 until classObject.fieldNamesIndicies.size) {
-                                    val index = classObject.fieldNamesIndicies[i]
-                                    when (val value = heapObject.instanceFieldValues[i]) {
+                                classObject.instanceFields.forEachIndexed { index, field ->
+                                    when (val value = heapObject.instanceFieldValues[index]) {
                                         is ObjectValue -> {
                                             val other = mergeNode(db, instanceNodes, Labels.Instance, value.objectId)
                                             count++
                                             val rel = node.createRelationshipTo(other, Relationships.CONTAINS)
                                             count++
-                                            rel.setProperty("name", fieldName(index))
+                                            rel.setProperty("name", fieldName(field.nameId))
                                         }
                                         is PrimitiveValue<*> ->
-                                            node.setProperty(fieldName(index), value.value) // todo type + value
+                                            node.setProperty(fieldName(field.nameId), value.value) // todo type + value
                                         is ArrayValue -> {
                                         }
                                         UnknownValue -> {
