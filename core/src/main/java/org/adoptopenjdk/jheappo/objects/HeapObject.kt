@@ -48,18 +48,18 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 
     internal val stackTraceSerialNumber: UInt = buffer.extractU4()
-    internal val superClassObjectID: Long = buffer.extractID()
+    val superClassObjectID: Long = buffer.extractID()
     internal val classLoaderObjectID: Long = buffer.extractID()
     internal val signersObjectID: Long = buffer.extractID()
     internal val protectionDomainObjectID: Long = buffer.extractID()
     internal val reserved = arrayOf(buffer.extractID(), buffer.extractID())
-    internal val instanceSizeInBytes: UInt = buffer.extractU4()
+    val instanceSizeInBytes: UInt = buffer.extractU4()
 
     internal lateinit var staticFieldNameIndicies: LongArray
     internal lateinit var staticValues: Array<BasicDataTypeValue>
 
-    internal lateinit var fieldNamesIndicies: LongArray
-    internal lateinit var fieldTypes: IntArray
+    lateinit var fieldNamesIndicies: LongArray
+    lateinit var fieldTypes: IntArray
 
     init {
         extractConstantPool(buffer)
