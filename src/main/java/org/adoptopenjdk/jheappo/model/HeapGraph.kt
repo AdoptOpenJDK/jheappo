@@ -89,20 +89,19 @@ class HeapGraph(private val path: File) {
                                 count++
                                 for (i in 0 until classObject.fieldNamesIndicies.size) {
                                     val index = classObject.fieldNamesIndicies[i]
-                                    val type = heapObject.instanceFieldValues()[i]
-                                    when (type.type) {
-                                        BasicDataTypes.OBJECT -> {
-                                            val other = mergeNode(db, instanceNodes, Labels.Instance, type.value as Long)
+                                    when (val value = heapObject.instanceFieldValues()[i]) {
+                                        is ObjectValue -> {
+                                            val other = mergeNode(db, instanceNodes, Labels.Instance, value.objectId)
                                             count++
                                             val rel = node.createRelationshipTo(other, Relationships.CONTAINS)
                                             count++
                                             rel.setProperty("name", fieldName(index))
                                         }
-                                        BasicDataTypes.BOOLEAN, BasicDataTypes.CHAR, BasicDataTypes.FLOAT, BasicDataTypes.DOUBLE, BasicDataTypes.BYTE, BasicDataTypes.SHORT, BasicDataTypes.INT, BasicDataTypes.LONG -> node.setProperty(
-                                                fieldName(index), type.value) // todo type + value
-                                        BasicDataTypes.ARRAY -> {
+                                        is PrimitiveValue<*> ->
+                                            node.setProperty(fieldName(index), value.value) // todo type + value
+                                        is ArrayValue -> {
                                         }
-                                        BasicDataTypes.UNKNOWN -> {
+                                        UnknownValue -> {
                                         }
                                     }
                                 }
