@@ -25,7 +25,7 @@ import java.io.PrintStream
  * See https://hg.openjdk.java.net/jdk/jdk/file/9a73a4e4011f/src/hotspot/share/services/heapDumper.cpp for details on
  * the format.
  */
-class EncodedChunk private constructor(private val body: ByteArray, index: Int) {
+internal class EncodedChunk private constructor(private val body: ByteArray, index: Int) {
     var index: Int = 0
         private set
 

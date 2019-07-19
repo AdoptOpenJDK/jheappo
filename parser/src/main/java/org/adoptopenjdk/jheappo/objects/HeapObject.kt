@@ -42,7 +42,7 @@ sealed class HeapObject(buffer: EncodedChunk) {
         11  | long
  */
 
-class ClassMetadata(buffer: EncodedChunk) : HeapObject(buffer) {
+class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x20U
     }
@@ -142,7 +142,7 @@ ID class object ID
 u4 number of bytes that follow
 [value]*  instance field values (this class, followed by super class, etc)
  */
-class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
+class InstanceObject internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x21U
@@ -188,7 +188,7 @@ u4 number of elements
 ID array class object ID
 [ID]* elements
  */
-class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
+class ObjectArray internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x22U
     }
@@ -210,7 +210,7 @@ class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class PrimitiveArray(buffer: EncodedChunk) : HeapObject(buffer) {
+class PrimitiveArray internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     /*
         id         array object ID
@@ -241,7 +241,7 @@ class PrimitiveArray(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class RootJavaFrame(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootJavaFrame internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x03U
@@ -257,7 +257,7 @@ class RootJavaFrame(buffer: EncodedChunk) : HeapObject(buffer) {
     0x01  | ID      | object ID
           | ID      | JNI global ref ID
  */
-class RootJNIGlobal(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootJNIGlobal internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x01U
@@ -270,7 +270,7 @@ class RootJNIGlobal(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class RootJNILocal(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootJNILocal internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x02U
@@ -283,13 +283,13 @@ class RootJNILocal(buffer: EncodedChunk) : HeapObject(buffer) {
 
 }
 
-class RootMonitorUsed(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootMonitorUsed internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x07U
     }
 }
 
-class RootNativeStack(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootNativeStack internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x04U
@@ -298,13 +298,13 @@ class RootNativeStack(buffer: EncodedChunk) : HeapObject(buffer) {
     private val threadSerialNumber: UInt = buffer.extractU4()
 }
 
-class RootStickyClass(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootStickyClass internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x05U
     }
 }
 
-class RootThreadBlock(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootThreadBlock internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x06U
@@ -323,7 +323,7 @@ class RootThreadBlock(buffer: EncodedChunk) : HeapObject(buffer) {
           | u4      | stack trace serial number
  */
 
-class RootThreadObject(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootThreadObject internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x08U
@@ -338,7 +338,7 @@ class RootThreadObject(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class RootUnknown(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootUnknown internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0xFFU
@@ -349,7 +349,7 @@ class RootUnknown(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class UTF8String(buffer: EncodedChunk) : HeapObject(buffer) {
+class UTF8String internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     val string: String = String(buffer.readRemaining())
 
