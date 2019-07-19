@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.model;
+package org.adoptopenjdk.jheappo.tools;
 
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.RelationshipType;

@@ -1,11 +1,15 @@
-package org.adoptopenjdk.jheappo.objects
+package org.adoptopenjdk.jheappo.parser.heap
 
-import org.adoptopenjdk.jheappo.io.EncodedChunk
-import org.adoptopenjdk.jheappo.model.BasicDataTypeValue
-import org.adoptopenjdk.jheappo.model.ObjectValue
+import org.adoptopenjdk.jheappo.parser.BasicDataTypeValue
+import org.adoptopenjdk.jheappo.parser.EncodedChunk
+import org.adoptopenjdk.jheappo.parser.FieldType
+import org.adoptopenjdk.jheappo.parser.Id
+import org.adoptopenjdk.jheappo.parser.ObjectValue
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 sealed class HeapObject(buffer: EncodedChunk) {
-    val id: Long = buffer.extractID()
+    val id: Id = buffer.extractID()
 }
 
 /*
@@ -42,29 +46,27 @@ sealed class HeapObject(buffer: EncodedChunk) {
         11  | long
  */
 
-class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
+class ClassMetadata internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
+        private val logger: Logger = LoggerFactory.getLogger(ClassMetadata::class.java)
         const val TAG: UByte = 0x20U
     }
 
     internal val stackTraceSerialNumber: UInt = buffer.extractU4()
-    val superClassObjectID: Long = buffer.extractID()
-    internal val classLoaderObjectID: Long = buffer.extractID()
-    internal val signersObjectID: Long = buffer.extractID()
-    internal val protectionDomainObjectID: Long = buffer.extractID()
+    val superClassObjectID: Id = buffer.extractID()
+    internal val classLoaderObjectID: Id = buffer.extractID()
+    internal val signersObjectID: Id = buffer.extractID()
+    internal val protectionDomainObjectID: Id = buffer.extractID()
     internal val reserved = arrayOf(buffer.extractID(), buffer.extractID())
     val instanceSizeInBytes: UInt = buffer.extractU4()
 
-    internal lateinit var staticFieldNameIndicies: LongArray
-    internal lateinit var staticValues: Array<BasicDataTypeValue>
-
-    lateinit var fieldNamesIndicies: LongArray
-    lateinit var fieldTypes: IntArray
+    internal val staticFields: List<FieldWithValueMetadata>
+    val instanceFields: List<FieldWithTypeMetadata>
 
     init {
         extractConstantPool(buffer)
-        extractStaticFields(buffer)
-        extractInstanceFields(buffer)
+        staticFields = extractStaticFields(buffer)
+        instanceFields = extractInstanceFields(buffer)
     }
 
     /*
@@ -77,8 +79,8 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
         val numberOfRecords = buffer.extractU2().toInt()
         for (i in 0 until numberOfRecords) {
             val constantPoolIndex = buffer.extractU2().toInt()
-            val value = buffer.extractBasicType(buffer.extractU1().toInt())
-            println("Constant Pool: $constantPoolIndex:$value")
+            val value = buffer.extractBasicType(FieldType.fromInt(buffer.extractU1()))
+            logger.debug("Constant Pool: $constantPoolIndex:$value")
         }
     }
 
@@ -88,17 +90,17 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
               | u1    | type of field: (See Basic Type)
               | value | value of entry (u1, u2, u4, or u8 based on type of field)
      */
-    private fun extractStaticFields(buffer: EncodedChunk) {
+    private fun extractStaticFields(buffer: EncodedChunk): List<FieldWithValueMetadata> {
         val numberOfRecords = buffer.extractU2().toInt()
-        staticFieldNameIndicies = LongArray(numberOfRecords)
-        val values = ArrayList<BasicDataTypeValue>(numberOfRecords)
-
+        // create correct sized list filled with nulls to avoid resize allocation
+        val fields = MutableList<FieldWithValueMetadata?>(numberOfRecords) { null }
         for (i in 0 until numberOfRecords) {
-            staticFieldNameIndicies[i] = buffer.extractID()
-            values.add(buffer.extractBasicType(buffer.extractU1().toInt()))
+            val id = buffer.extractID()
+            val value = buffer.extractBasicType(FieldType.fromInt(buffer.extractU1()))
+            fields[i] = FieldWithValueMetadata(id, value)
         }
 
-        staticValues = values.toTypedArray()
+        return fields.requireNoNulls().toList()
     }
 
     /*
@@ -106,24 +108,24 @@ class ClassObject(buffer: EncodedChunk) : HeapObject(buffer) {
               | ID    | field name string ID
               | u1    | type of field: (See Basic Type)
      */
-    private fun extractInstanceFields(buffer: EncodedChunk) {
+    private fun extractInstanceFields(buffer: EncodedChunk): List<FieldWithTypeMetadata> {
         val numberOfInstanceFields = buffer.extractU2().toInt()
-        if (numberOfInstanceFields > -1) {
-            fieldNamesIndicies = LongArray(numberOfInstanceFields)
-            fieldTypes = IntArray(numberOfInstanceFields)
-        }
+        val fields = MutableList<FieldWithTypeMetadata?>(numberOfInstanceFields) { null }
         for (i in 0 until numberOfInstanceFields) {
-            fieldNamesIndicies[i] = buffer.extractID()
-            if (fieldNamesIndicies[i] < 1)
-                println("field name invalid id: " + fieldNamesIndicies[i])
-            fieldTypes[i] = buffer.extractU1().toInt()
+            val id = buffer.extractID()
+            if (id.id < 1u) {
+                logger.warn("field name invalid id: $id")
+            }
+            val type = (buffer.extractU1().let { FieldType.fromInt(it) })
+            fields[i] = FieldWithTypeMetadata(id, type)
         }
+        return fields.requireNoNulls().toList()
     }
 
     override fun toString(): String {
         var fields = ", Fields --> "
-        for (i in fieldNamesIndicies.indices) {
-            fields += ", " + fieldNamesIndicies[i]
+        for (fm in instanceFields) {
+            fields += ", ${fm.nameId}"
         }
 
         return "Class Object -->" + id +
@@ -143,14 +145,15 @@ ID class object ID
 u4 number of bytes that follow
 [value]*  instance field values (this class, followed by super class, etc)
  */
-class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
+class InstanceObject internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x21U
     }
+
     val stackTraceSerialNumber: UInt
-    val classObjectID: Long
-    var instanceFieldValues = arrayOf<BasicDataTypeValue>()
+    val classObjectID: Id
+    var instanceFieldValues = listOf<BasicDataTypeValue>()
 
     private var buffer: EncodedChunk? = null
 
@@ -162,12 +165,12 @@ class InstanceObject(buffer: EncodedChunk) : HeapObject(buffer) {
         this.buffer = EncodedChunk(buffer.read(bufferLength.toInt()))
     }
 
-    fun inflate(classObject: ClassObject) {
+    fun inflate(classMetadata: ClassMetadata) {
         val b = buffer ?: return
         if (!b.endOfBuffer()) {
-            instanceFieldValues = classObject.fieldTypes
-                    .map { b.extractBasicType(it) }
-                    .toTypedArray()
+            // TODO handle superclass fields
+            instanceFieldValues = classMetadata.instanceFields
+                    .map { b.extractBasicType(it.type) }
         }
         buffer = null
     }
@@ -190,29 +193,29 @@ u4 number of elements
 ID array class object ID
 [ID]* elements
  */
-class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
+class ObjectArray internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x22U
     }
 
     private val stackTraceSerialNumber: UInt = buffer.extractU4()
     val size: UInt = buffer.extractU4()
-    private val elementsObjectID: Long = buffer.extractID()
+    private val elementsObjectID: Id = buffer.extractID()
 
     private val elements: Array<ObjectValue>
 
     init {
-        elements = (0U until size).map { buffer.extractBasicType(BasicDataTypes.OBJECT) }
+        elements = (0U until size).map { buffer.extractBasicType(FieldType.OBJECT) }
                 .map { it as ObjectValue }
                 .toTypedArray()
     }
 
-    fun getValueObjectIDAt(index: Int): Long {
+    fun getValueObjectIDAt(index: Int): Id {
         return elements[index].objectId
     }
 }
 
-class PrimitiveArray(buffer: EncodedChunk) : HeapObject(buffer) {
+class PrimitiveArray internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     /*
         id         array object ID
@@ -230,19 +233,20 @@ class PrimitiveArray(buffer: EncodedChunk) : HeapObject(buffer) {
     private val elementType: UByte = buffer.extractU1()
     private val signature: Char
 
-    internal val elements: Array<BasicDataTypeValue>
+    internal val elements: PrimitiveArrayWrapper
 
     init {
-        val dataType = BasicDataTypes.fromInt(elementType.toInt()) ?: BasicDataTypes.UNKNOWN
-        if (dataType == BasicDataTypes.UNKNOWN) {
+        // TODO decide what to do about unknown records
+        val dataType = FieldType.fromInt(elementType)
+        if (dataType == FieldType.UNKNOWN) {
             throw IllegalArgumentException("Unknown data type : $elementType")
         }
-        signature = BasicDataTypes.fromInt(elementType.toInt())!!.mnemonic
-        elements = (0U until size).map { buffer.extractBasicType(dataType) }.toTypedArray()
+        signature = dataType.mnemonic
+        elements = buffer.extractPrimitiveArray(dataType, size)
     }
 }
 
-class RootJavaFrame(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootJavaFrame internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x03U
@@ -258,20 +262,20 @@ class RootJavaFrame(buffer: EncodedChunk) : HeapObject(buffer) {
     0x01  | ID      | object ID
           | ID      | JNI global ref ID
  */
-class RootJNIGlobal(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootJNIGlobal internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x01U
     }
 
-    val jniGlobalRefID: Long = buffer.extractID()
+    val jniGlobalRefID: Id = buffer.extractID()
 
     override fun toString(): String {
         return "RootJNIGlobal : $id:$jniGlobalRefID"
     }
 }
 
-class RootJNILocal(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootJNILocal internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x02U
@@ -284,13 +288,13 @@ class RootJNILocal(buffer: EncodedChunk) : HeapObject(buffer) {
 
 }
 
-class RootMonitorUsed(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootMonitorUsed internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x07U
     }
 }
 
-class RootNativeStack(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootNativeStack internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x04U
@@ -299,13 +303,13 @@ class RootNativeStack(buffer: EncodedChunk) : HeapObject(buffer) {
     private val threadSerialNumber: UInt = buffer.extractU4()
 }
 
-class RootStickyClass(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootStickyClass internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
     companion object {
         const val TAG: UByte = 0x05U
     }
 }
 
-class RootThreadBlock(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootThreadBlock internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x06U
@@ -324,7 +328,7 @@ class RootThreadBlock(buffer: EncodedChunk) : HeapObject(buffer) {
           | u4      | stack trace serial number
  */
 
-class RootThreadObject(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootThreadObject internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0x08U
@@ -339,7 +343,7 @@ class RootThreadObject(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class RootUnknown(buffer: EncodedChunk) : HeapObject(buffer) {
+class RootUnknown internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     companion object {
         const val TAG: UByte = 0xFFU
@@ -350,7 +354,7 @@ class RootUnknown(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 }
 
-class UTF8String(buffer: EncodedChunk) : HeapObject(buffer) {
+class UTF8String internal constructor(buffer: EncodedChunk) : HeapObject(buffer) {
 
     val string: String = String(buffer.readRemaining())
 
@@ -358,3 +362,6 @@ class UTF8String(buffer: EncodedChunk) : HeapObject(buffer) {
         return "$id : $string"
     }
 }
+
+class FieldWithValueMetadata(val nameId: Id, val value: BasicDataTypeValue)
+class FieldWithTypeMetadata(val nameId: Id, val type: FieldType)

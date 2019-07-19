@@ -1,20 +1,25 @@
-package org.adoptopenjdk.jheappo.model
+package org.adoptopenjdk.jheappo.tools
 
-import org.adoptopenjdk.jheappo.io.HeapDumpSegment
-import org.adoptopenjdk.jheappo.io.HeapProfile
-import org.adoptopenjdk.jheappo.io.LoadClass
-import org.adoptopenjdk.jheappo.io.StackFrame
-import org.adoptopenjdk.jheappo.io.StackTrace
-import org.adoptopenjdk.jheappo.io.UTF8StringSegment
-import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Labels
-import org.adoptopenjdk.jheappo.model.HeapGraphExtras.Relationships
-import org.adoptopenjdk.jheappo.objects.ClassObject
-import org.adoptopenjdk.jheappo.objects.InstanceObject
-import org.adoptopenjdk.jheappo.objects.ObjectArray
-import org.adoptopenjdk.jheappo.objects.PrimitiveArray
-import org.adoptopenjdk.jheappo.objects.RootJavaFrame
-import org.adoptopenjdk.jheappo.objects.RootThreadObject
-import org.adoptopenjdk.jheappo.objects.UTF8String
+import org.adoptopenjdk.jheappo.parser.ArrayValue
+import org.adoptopenjdk.jheappo.parser.HeapDumpSegment
+import org.adoptopenjdk.jheappo.parser.HeapProfile
+import org.adoptopenjdk.jheappo.parser.LoadClass
+import org.adoptopenjdk.jheappo.parser.ObjectValue
+import org.adoptopenjdk.jheappo.parser.PrimitiveValue
+import org.adoptopenjdk.jheappo.parser.StackFrame
+import org.adoptopenjdk.jheappo.parser.StackTrace
+import org.adoptopenjdk.jheappo.parser.UTF8StringSegment
+import org.adoptopenjdk.jheappo.parser.UnknownValue
+import org.adoptopenjdk.jheappo.tools.HeapGraphExtras.Labels
+import org.adoptopenjdk.jheappo.tools.HeapGraphExtras.Relationships
+import org.adoptopenjdk.jheappo.parser.heap.ClassMetadata
+import org.adoptopenjdk.jheappo.parser.heap.InstanceObject
+import org.adoptopenjdk.jheappo.parser.heap.ObjectArray
+import org.adoptopenjdk.jheappo.parser.heap.PrimitiveArray
+import org.adoptopenjdk.jheappo.parser.heap.RootJavaFrame
+import org.adoptopenjdk.jheappo.parser.heap.RootThreadObject
+import org.adoptopenjdk.jheappo.parser.heap.UTF8String
+import org.adoptopenjdk.jheappo.parser.Id
 import org.neo4j.graphdb.GraphDatabaseService
 import org.neo4j.graphdb.Node
 import org.neo4j.graphdb.Transaction
@@ -26,12 +31,12 @@ import java.util.HashMap
 import java.util.HashSet
 
 class HeapGraph(private val path: File) {
-    internal var stringTable = HashMap<Long, UTF8String>()
-    internal var clazzTable = HashMap<Long, ClassObject>()
-    internal var clazzNodes = HashMap<Long, Node>()
-    internal var clazzNames = HashMap<Long, Long>()
-    internal var instanceNodes = HashMap<Long, Node>()
-    internal var oopTable = HashMap<Long, InstanceObject>()
+    internal var stringTable = HashMap<Id, UTF8String>()
+    internal var clazzTable = HashMap<Id, ClassMetadata>()
+    internal var clazzNodes = HashMap<Id, Node>()
+    internal var clazzNames = HashMap<Id, Id>()
+    internal var instanceNodes = HashMap<Id, Node>()
+    internal var oopTable = HashMap<Id, InstanceObject>()
     internal var loadClassTable = HashMap<Long, LoadClass>()
     internal var rootStickClass = HashSet<Long>()
     internal var rootJNIGlobal = HashMap<Long, Long>()
@@ -63,25 +68,22 @@ class HeapGraph(private val path: File) {
                     is LoadClass -> // loadClassTable.put(((LoadClass) frame).getClassObjectID(), (LoadClass) frame); //store mapping of class to class name.
                         // out.write(frame.toString() + "\n");
                         clazzNames[frame.classObjectID] = frame.classNameStringID
-                    is HeapDumpSegment -> while (!frame.hasNext()) {
+                    is HeapDumpSegment -> while (frame.hasNext()) {
                         val heapObject = frame.next()
                         if (heapObject == null) {
                             println("parser error resolving type in HeapDumpSegment....")
                             continue
                         }
                         when (heapObject) {
-                            is ClassObject -> {
+                            is ClassMetadata -> {
                                 clazzTable[heapObject.id] = heapObject
                                 // clazzFile.write(heapObject.toString() + "\n");
                                 val node = mergeNode(db, clazzNodes, Labels.Class, heapObject.id)
                                 count++
                                 node.setProperty("name", className(heapObject.id))
                                 node.setProperty("size", heapObject.instanceSizeInBytes)
-                                for (i in 0 until heapObject.fieldNamesIndicies.size) {
-                                    val index = heapObject.fieldNamesIndicies[i]
-                                    val type = heapObject.fieldTypes[i]
-                                    // todo string resolution
-                                    node.setProperty(fieldName(index), type)
+                                heapObject.instanceFields.forEach { field ->
+                                    node.setProperty(fieldName(field.nameId), field.type)
                                 }
                                 val parent = mergeNode(db, clazzNodes, Labels.Class, heapObject.superClassObjectID)
                                 count++
@@ -100,18 +102,17 @@ class HeapGraph(private val path: File) {
                                 count++
                                 node.createRelationshipTo(classNode, Relationships.IS_CLASS)
                                 count++
-                                for (i in 0 until classObject.fieldNamesIndicies.size) {
-                                    val index = classObject.fieldNamesIndicies[i]
-                                    when (val value = heapObject.instanceFieldValues[i]) {
+                                classObject.instanceFields.forEachIndexed { index, field ->
+                                    when (val value = heapObject.instanceFieldValues[index]) {
                                         is ObjectValue -> {
                                             val other = mergeNode(db, instanceNodes, Labels.Instance, value.objectId)
                                             count++
                                             val rel = node.createRelationshipTo(other, Relationships.CONTAINS)
                                             count++
-                                            rel.setProperty("name", fieldName(index))
+                                            rel.setProperty("name", fieldName(field.nameId))
                                         }
                                         is PrimitiveValue<*> ->
-                                            node.setProperty(fieldName(index), value.value) // todo type + value
+                                            node.setProperty(fieldName(field.nameId), value.value) // todo type + value
                                         is ArrayValue -> {
                                         }
                                         UnknownValue -> {
@@ -181,15 +182,15 @@ class HeapGraph(private val path: File) {
         }
     }
 
-    private fun className(id: Long): String {
+    private fun className(id: Id): String {
         return stringTable[clazzNames[id]]!!.string
     }
 
-    private fun fieldName(index: Long): String {
+    private fun fieldName(index: Id): String {
         return "_" + stringTable[index]!!.string
     }
 
-    private fun mergeNode(db: GraphDatabaseService, cache: HashMap<Long, Node>, type: Labels, objectId: Long): Node {
+    private fun mergeNode(db: GraphDatabaseService, cache: HashMap<Id, Node>, type: Labels, objectId: Id): Node {
         return cache.computeIfAbsent(objectId) { id ->
             val n = db.createNode(type)
             n.setProperty("id", id)
@@ -206,7 +207,7 @@ class HeapGraph(private val path: File) {
         }
     }
 
-    fun getClazzById(cid: Long): ClassObject {
+    fun getClazzById(cid: Id): ClassMetadata {
         return clazzTable.getValue(cid)
     }
 
@@ -218,7 +219,7 @@ class HeapGraph(private val path: File) {
         oopTable[instanceObject.id] = instanceObject
     }
 
-    fun getInstanceObject(id: Long): InstanceObject {
+    fun getInstanceObject(id: Id): InstanceObject {
         return oopTable.getValue(id)
     }
 

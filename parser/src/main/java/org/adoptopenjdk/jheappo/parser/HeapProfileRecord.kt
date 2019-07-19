@@ -1,20 +1,22 @@
-package org.adoptopenjdk.jheappo.io
+package org.adoptopenjdk.jheappo.parser
 
-import org.adoptopenjdk.jheappo.objects.ClassObject
-import org.adoptopenjdk.jheappo.objects.HeapObject
-import org.adoptopenjdk.jheappo.objects.InstanceObject
-import org.adoptopenjdk.jheappo.objects.ObjectArray
-import org.adoptopenjdk.jheappo.objects.PrimitiveArray
-import org.adoptopenjdk.jheappo.objects.RootJNIGlobal
-import org.adoptopenjdk.jheappo.objects.RootJNILocal
-import org.adoptopenjdk.jheappo.objects.RootJavaFrame
-import org.adoptopenjdk.jheappo.objects.RootMonitorUsed
-import org.adoptopenjdk.jheappo.objects.RootNativeStack
-import org.adoptopenjdk.jheappo.objects.RootStickyClass
-import org.adoptopenjdk.jheappo.objects.RootThreadBlock
-import org.adoptopenjdk.jheappo.objects.RootThreadObject
-import org.adoptopenjdk.jheappo.objects.RootUnknown
-import org.adoptopenjdk.jheappo.objects.UTF8String
+import org.adoptopenjdk.jheappo.parser.heap.ClassMetadata
+import org.adoptopenjdk.jheappo.parser.heap.HeapObject
+import org.adoptopenjdk.jheappo.parser.heap.InstanceObject
+import org.adoptopenjdk.jheappo.parser.heap.ObjectArray
+import org.adoptopenjdk.jheappo.parser.heap.PrimitiveArray
+import org.adoptopenjdk.jheappo.parser.heap.RootJNIGlobal
+import org.adoptopenjdk.jheappo.parser.heap.RootJNILocal
+import org.adoptopenjdk.jheappo.parser.heap.RootJavaFrame
+import org.adoptopenjdk.jheappo.parser.heap.RootMonitorUsed
+import org.adoptopenjdk.jheappo.parser.heap.RootNativeStack
+import org.adoptopenjdk.jheappo.parser.heap.RootStickyClass
+import org.adoptopenjdk.jheappo.parser.heap.RootThreadBlock
+import org.adoptopenjdk.jheappo.parser.heap.RootThreadObject
+import org.adoptopenjdk.jheappo.parser.heap.RootUnknown
+import org.adoptopenjdk.jheappo.parser.heap.UTF8String
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -24,37 +26,37 @@ import org.adoptopenjdk.jheappo.objects.UTF8String
 
 sealed class HeapProfileRecord
 
-class AllocSites(body: EncodedChunk) : HeapProfileRecord() {
+class AllocSites internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x06U
     }
 }
 
-class ControlSettings(body: EncodedChunk) : HeapProfileRecord() {
+class ControlSettings internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x0EU
     }
 }
 
-class CPUSamples(body: EncodedChunk) : HeapProfileRecord() {
+class CPUSamples internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x0DU
     }
 }
 
-class EndThread(body: EncodedChunk) : HeapProfileRecord() {
+class EndThread internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x0BU
     }
 }
 
-class HeapDumpEnd(body: EncodedChunk) : HeapProfileRecord() {
+class HeapDumpEnd internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x2CU
     }
 }
 
-class HeapDumpSegment(private val body: EncodedChunk) : HeapProfileRecord() {
+class HeapDumpSegment internal constructor(private val body: EncodedChunk) : HeapProfileRecord() {
 
     /*
     ROOT UNKNOWN            | 0xFF  | ID      | object ID
@@ -141,12 +143,14 @@ class HeapDumpSegment(private val body: EncodedChunk) : HeapProfileRecord() {
     */
 
     companion object {
+        private val logger: Logger = LoggerFactory.getLogger(HeapDumpSegment::class.java)
+
         const val TAG1: UByte = 0x0CU
         const val TAG2: UByte = 0x1CU
     }
 
     fun hasNext(): Boolean {
-        return body.endOfBuffer()
+        return !body.endOfBuffer()
     }
 
     fun next(): HeapObject? {
@@ -160,25 +164,25 @@ class HeapDumpSegment(private val body: EncodedChunk) : HeapProfileRecord() {
             RootThreadBlock.TAG -> return RootThreadBlock(body)
             RootMonitorUsed.TAG -> return RootMonitorUsed(body)
             RootThreadObject.TAG -> return RootThreadObject(body)
-            ClassObject.TAG -> return ClassObject(body)
+            ClassMetadata.TAG -> return ClassMetadata(body)
             InstanceObject.TAG -> return InstanceObject(body)
             ObjectArray.TAG -> return ObjectArray(body)
             PrimitiveArray.TAG -> return PrimitiveArray(body)
             else -> {
-                println(typeCode.toString() + " not recognized... @index=" + body.index)
+                logger.warn(typeCode.toString() + " not recognized... @index=" + body.index)
                 return null
             }
         }
     }
 }
 
-class HeapSummary(body: EncodedChunk) : HeapProfileRecord() {
+class HeapSummary internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x07U
     }
 }
 
-class LoadClass(body: EncodedChunk) : HeapProfileRecord() {
+class LoadClass internal constructor(body: EncodedChunk) : HeapProfileRecord() {
 
     /*
         u4   |  class serial number (always > 0)
@@ -192,9 +196,9 @@ class LoadClass(body: EncodedChunk) : HeapProfileRecord() {
     }
 
     val classSerialNumber: Long = body.extractU4().toLong()
-    val classObjectID: Long = body.extractID()
+    val classObjectID: Id = body.extractID()
     val stackTraceSerialNumber: Long = body.extractU4().toLong()
-    val classNameStringID: Long = body.extractID()
+    val classNameStringID: Id = body.extractID()
 
     override fun toString(): String {
         return "Loaded -> $classSerialNumber:$classObjectID:$stackTraceSerialNumber:$classNameStringID"
@@ -214,24 +218,24 @@ class LoadClass(body: EncodedChunk) : HeapProfileRecord() {
           |  -3  | native method (Not implemented)
  */
 
-class StackFrame(body: EncodedChunk) : HeapProfileRecord() {
+class StackFrame internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x04U
     }
 
-    internal val stackFrameID: Long = body.extractID()
-    internal val methodNameStringID: Long = body.extractID()
-    internal val methodSignatureStringID: Long = body.extractID()
-    internal val sourceFileNameStringID: Long = body.extractID()
+    internal val stackFrameID: Id = body.extractID()
+    internal val methodNameStringID: Id = body.extractID()
+    internal val methodSignatureStringID: Id = body.extractID()
+    internal val sourceFileNameStringID: Id = body.extractID()
 
-    internal val classSerialNumber: Long = body.extractID()
+    internal val classSerialNumber: Id = body.extractID()
 
     override fun toString(): String {
         return "StackFrame --> $stackFrameID:$methodNameStringID:$methodSignatureStringID:$sourceFileNameStringID:$classSerialNumber"
     }
 }
 
-class StackTrace(body: EncodedChunk) : HeapProfileRecord() {
+class StackTrace internal constructor(body: EncodedChunk) : HeapProfileRecord() {
 
     /*
         u4    | stack trace serial number
@@ -248,10 +252,10 @@ class StackTrace(body: EncodedChunk) : HeapProfileRecord() {
     internal val threadSerialNumber: UInt = body.extractU4()
     internal val numberOfFrames: UInt = body.extractU4()
 
-    internal val stackFrameIDs: LongArray
+    internal val stackFrameIDs: Array<Id>
 
     init {
-        stackFrameIDs = LongArray(numberOfFrames.toInt())
+        stackFrameIDs = Array(numberOfFrames.toInt()) { Id(1u) }
         for (i in 0 until numberOfFrames.toInt()) {
             stackFrameIDs[i] = body.extractID()
         }
@@ -262,13 +266,13 @@ class StackTrace(body: EncodedChunk) : HeapProfileRecord() {
     }
 }
 
-class StartThread(body: EncodedChunk) : HeapProfileRecord() {
+class StartThread internal constructor(body: EncodedChunk) : HeapProfileRecord() {
     companion object {
         const val TAG: UByte = 0x0AU
     }
 }
 
-class UnloadClass(body: EncodedChunk) : HeapProfileRecord() {
+class UnloadClass internal constructor(body: EncodedChunk) : HeapProfileRecord() {
 
     /*
         u4   |  class serial number (always > 0)
@@ -285,7 +289,7 @@ class UnloadClass(body: EncodedChunk) : HeapProfileRecord() {
     }
 }
 
-class UTF8StringSegment(private val body: EncodedChunk) : HeapProfileRecord() {
+class UTF8StringSegment internal constructor(private val body: EncodedChunk) : HeapProfileRecord() {
 
     /*
         ID     | ID for this string

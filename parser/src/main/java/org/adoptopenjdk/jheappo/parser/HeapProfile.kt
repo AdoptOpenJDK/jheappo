@@ -1,4 +1,4 @@
-package org.adoptopenjdk.jheappo.io
+package org.adoptopenjdk.jheappo.parser
 
 /*
  * Copyright (c) 2018 Kirk Pepperdine.
@@ -7,12 +7,15 @@ package org.adoptopenjdk.jheappo.io
  */
 
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.*
 import java.nio.file.Path
 
 class HeapProfile(private val path: Path, private val input: DataInputStream) {
-
     companion object {
+        private val logger: Logger = LoggerFactory.getLogger(HeapProfile::class.java)
+
         fun open(path: Path, inputStream: InputStream): HeapProfile {
             val input = DataInputStream(BufferedInputStream(inputStream))
             return HeapProfile(path, input)
@@ -50,39 +53,39 @@ class HeapProfile(private val path: Path, private val input: DataInputStream) {
             UTF8StringSegment.TAG -> return UTF8StringSegment(readBody(input, bodySize))
             LoadClass.TAG -> return LoadClass(readBody(input, bodySize))
             UnloadClass.TAG -> {
-                println("UnloadClass")
+                logger.debug("UnloadClass")
                 return UnloadClass(readBody(input, bodySize))
             }
             StackFrame.TAG -> return StackFrame(readBody(input, bodySize))
             StackTrace.TAG -> return StackTrace(readBody(input, bodySize))
             AllocSites.TAG -> {
-                println("AllocSites")
+                logger.debug("AllocSites")
                 return AllocSites(readBody(input, bodySize))
             }
             HeapSummary.TAG -> {
-                println("HeapSummary")
+                logger.debug("HeapSummary")
                 return HeapSummary(readBody(input, bodySize))
             }
             StartThread.TAG -> {
-                println("StartThread")
+                logger.debug("StartThread")
                 return StartThread(readBody(input, bodySize))
             }
             EndThread.TAG -> {
-                println("EndThread")
+                logger.debug("EndThread")
                 return EndThread(readBody(input, bodySize))
             }
             HeapDumpSegment.TAG1, HeapDumpSegment.TAG2 -> return HeapDumpSegment(readBody(input, bodySize))
             HeapDumpEnd.TAG -> {
-                println("HeapDumpEnd")
+                logger.debug("HeapDumpEnd")
                 heapDumpEnd = true
                 return HeapDumpEnd(readBody(input, bodySize))
             }
             CPUSamples.TAG -> {
-                println("CPUSamples")
+                logger.debug("CPUSamples")
                 return CPUSamples(readBody(input, bodySize))
             }
             ControlSettings.TAG -> {
-                println("ControlSettings")
+                logger.debug("ControlSettings")
                 return ControlSettings(readBody(input, bodySize))
             }
             else -> throw IOException("Unknown record type + $tag")

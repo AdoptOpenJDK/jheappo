@@ -1,22 +1,23 @@
-package org.adoptopenjdk.jheappo.model
+package org.adoptopenjdk.jheappo.tools
 
-import org.adoptopenjdk.jheappo.io.HeapDumpSegment
-import org.adoptopenjdk.jheappo.io.HeapProfile
-import org.adoptopenjdk.jheappo.io.LoadClass
-import org.adoptopenjdk.jheappo.io.StackFrame
-import org.adoptopenjdk.jheappo.io.StackTrace
-import org.adoptopenjdk.jheappo.io.UTF8StringSegment
-import org.adoptopenjdk.jheappo.objects.ClassObject
-import org.adoptopenjdk.jheappo.objects.InstanceObject
-import org.adoptopenjdk.jheappo.objects.ObjectArray
-import org.adoptopenjdk.jheappo.objects.PrimitiveArray
-import org.adoptopenjdk.jheappo.objects.RootJNIGlobal
-import org.adoptopenjdk.jheappo.objects.RootJNILocal
-import org.adoptopenjdk.jheappo.objects.RootJavaFrame
-import org.adoptopenjdk.jheappo.objects.RootMonitorUsed
-import org.adoptopenjdk.jheappo.objects.RootStickyClass
-import org.adoptopenjdk.jheappo.objects.RootThreadObject
-import org.adoptopenjdk.jheappo.objects.UTF8String
+import org.adoptopenjdk.jheappo.parser.HeapDumpSegment
+import org.adoptopenjdk.jheappo.parser.HeapProfile
+import org.adoptopenjdk.jheappo.parser.LoadClass
+import org.adoptopenjdk.jheappo.parser.StackFrame
+import org.adoptopenjdk.jheappo.parser.StackTrace
+import org.adoptopenjdk.jheappo.parser.UTF8StringSegment
+import org.adoptopenjdk.jheappo.parser.heap.ClassMetadata
+import org.adoptopenjdk.jheappo.parser.heap.InstanceObject
+import org.adoptopenjdk.jheappo.parser.heap.ObjectArray
+import org.adoptopenjdk.jheappo.parser.heap.PrimitiveArray
+import org.adoptopenjdk.jheappo.parser.heap.RootJNIGlobal
+import org.adoptopenjdk.jheappo.parser.heap.RootJNILocal
+import org.adoptopenjdk.jheappo.parser.heap.RootJavaFrame
+import org.adoptopenjdk.jheappo.parser.heap.RootMonitorUsed
+import org.adoptopenjdk.jheappo.parser.heap.RootStickyClass
+import org.adoptopenjdk.jheappo.parser.heap.RootThreadObject
+import org.adoptopenjdk.jheappo.parser.heap.UTF8String
+import org.adoptopenjdk.jheappo.parser.Id
 import java.io.PrintStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -25,18 +26,18 @@ import java.util.HashSet
 
 class JavaHeap(private val outputDir: Path) {
 
-    internal var stringTable = HashMap<Long, UTF8String>()
-    internal var clazzTable = HashMap<Long, ClassObject>()
-    internal var oopTable = HashMap<Long, InstanceObject>()
-    internal var loadClassTable = HashMap<Long, LoadClass>()
-    internal var rootStickClass = HashSet<Long>()
-    internal var rootJNIGlobal = HashMap<Long, Long>()
-    internal var rootJNILocal = HashMap<Long, Long>()
-    internal var rootMonitorUsed = HashSet<Long>()
-    internal var rootJavaFrame = HashMap<Long, RootJavaFrame>()
-    internal var rootThreadObject = HashMap<Long, RootThreadObject>()
-    internal var primitiveArray = HashMap<Long, PrimitiveArray>()
-    internal var objectArray = HashMap<Long, ObjectArray>()
+    internal var stringTable = HashMap<Id, UTF8String>()
+    internal var clazzTable = HashMap<Id, ClassMetadata>()
+    internal var oopTable = HashMap<Id, InstanceObject>()
+    internal var loadClassTable = HashMap<Id, LoadClass>()
+    internal var rootStickClass = HashSet<Id>()
+    internal var rootJNIGlobal = HashMap<Id, Id>()
+    internal var rootJNILocal = HashMap<Id, Id>()
+    internal var rootMonitorUsed = HashSet<Id>()
+    internal var rootJavaFrame = HashMap<Id, RootJavaFrame>()
+    internal var rootThreadObject = HashMap<Id, RootThreadObject>()
+    internal var primitiveArray = HashMap<Id, PrimitiveArray>()
+    internal var objectArray = HashMap<Id, ObjectArray>()
 
     fun populateFrom(heapDump: HeapProfile) {
         Files.newBufferedWriter(outputDir.resolve("string.table")).use { out ->
@@ -57,21 +58,23 @@ class JavaHeap(private val outputDir: Path) {
                                 is UTF8StringSegment -> {
                                     val string = frame.toUtf8String()
                                     stringTable[string.id] = string
-                                    out.write(java.lang.Long.toString(string.id) + "->" + string.string + "\n")
+                                    out.write("${string.id}->${string.string}\n")
                                 }
                                 is LoadClass -> {
                                     loadClassTable[frame.classObjectID] = frame //store mapping of class to class name.
                                     out.write(frame.toString() + "\n")
                                 }
-                                is HeapDumpSegment -> while (!frame.hasNext()) {
+                                is HeapDumpSegment -> while (frame.hasNext()) {
                                     val heapObject = frame.next()
                                     if (heapObject == null) {
                                         println("parser error resolving type in HeapDumpSegment....")
                                         continue
                                     }
-                                    if (heapObject is ClassObject) {
+                                    if (heapObject is ClassMetadata) {
                                         clazzTable[heapObject.id] = heapObject
-                                        clazzFile.write(heapObject.toString() + "\n")
+                                        val loadClassRecord = loadClassTable[heapObject.id]
+                                        val className = stringTable[loadClassRecord?.classNameStringID]
+                                        clazzFile.write("$heapObject ${className?.string}\n")
                                     } else if (heapObject is InstanceObject) {
                                         val instanceObject = heapObject as InstanceObject?
                                         instanceObject!!.inflate(this.getClazzById(instanceObject.classObjectID))
@@ -105,7 +108,7 @@ class JavaHeap(private val outputDir: Path) {
         }
     }
 
-    fun getClazzById(cid: Long): ClassObject {
+    fun getClazzById(cid: Id): ClassMetadata {
         return clazzTable.getValue(cid)
     }
 
@@ -117,7 +120,7 @@ class JavaHeap(private val outputDir: Path) {
         oopTable[instanceObject.id] = instanceObject
     }
 
-    fun getInstanceObject(id: Long): InstanceObject {
+    fun getInstanceObject(id: Id): InstanceObject {
         return oopTable.getValue(id)
     }
 }

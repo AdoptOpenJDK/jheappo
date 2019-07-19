@@ -16,7 +16,7 @@
     </prerequisites>
 
     <modules>
-        <module>core</module>
+        <module>parser</module>
         <module>tools</module>
     </modules>
 
@@ -27,6 +27,7 @@
         <surefire.version>3.0.0-M3</surefire.version>
         <kotlin.version>1.3.31</kotlin.version>
         <junit.version>5.5.0-M1</junit.version>
+        <slf4j.version>1.7.26</slf4j.version>
     </properties>
 
     <dependencies>
