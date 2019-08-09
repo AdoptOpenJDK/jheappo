@@ -137,7 +137,7 @@ class EncodedChunk private constructor(private val body: ByteArray, index: Int) 
             BasicDataTypes.DOUBLE -> DoubleValue(this.extractDouble())
             BasicDataTypes.LONG -> LongValue(this.extractLong())
             // TODO arrays?
-            else -> UnknownValue
+            else -> UnknownValue()
         }
     }
 

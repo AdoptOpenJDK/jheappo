@@ -208,6 +208,7 @@ class ObjectArray(buffer: EncodedChunk) : HeapObject(buffer) {
     }
 
     fun getValueObjectIDAt(index: Int): Long {
+
         return elements[index].objectId
     }
 }

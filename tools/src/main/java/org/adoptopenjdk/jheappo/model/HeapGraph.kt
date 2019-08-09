@@ -114,7 +114,7 @@ class HeapGraph(private val path: File) {
                                             node.setProperty(fieldName(index), value.value) // todo type + value
                                         is ArrayValue -> {
                                         }
-                                        UnknownValue -> {
+                                        UnknownValue() -> {
                                         }
                                     }
                                 }
