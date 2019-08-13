@@ -18,10 +18,10 @@ public class LoadClass extends HeapProfileRecord {
         ID   |  class name string ID
      */
 
-    long classSerialNumber;
-    long classObjectID;
-    long stackTraceSerialNumber;
-    long classNameStringID;
+    private long classSerialNumber;
+    private long classObjectID;
+    private long stackTraceSerialNumber;
+    private long classNameStringID;
 
     public LoadClass(EncodedChunk body) {
         classSerialNumber = body.extractU4();

@@ -34,11 +34,13 @@ public class HeapProfileHeader {
 
     public void extract(DataInputStream buffer) throws IOException {
         heapDumpVersion = extractVersionString(buffer);
-        if (!(SUPPORTED_VERSIONS[0].equals(heapDumpVersion) || (SUPPORTED_VERSIONS[1]).equals(heapDumpVersion)))
+        if (!(SUPPORTED_VERSIONS[0].equals(heapDumpVersion) || (SUPPORTED_VERSIONS[1]).equals(heapDumpVersion))) {
             throw new IOException(heapDumpVersion + " is not supported");
+        }
         sizeOfIdentifiers = buffer.readInt();
-        if (sizeOfIdentifiers != SUPPORTED_IDENIFIER_SIZE[1] && sizeOfIdentifiers != SUPPORTED_IDENIFIER_SIZE[0])
+        if (sizeOfIdentifiers != SUPPORTED_IDENIFIER_SIZE[1] && sizeOfIdentifiers != SUPPORTED_IDENIFIER_SIZE[0]) {
             throw new IOException("Unsupported identifier size " + sizeOfIdentifiers);
+        }
         millisecSinceEPOC = buffer.readLong();
     }
 

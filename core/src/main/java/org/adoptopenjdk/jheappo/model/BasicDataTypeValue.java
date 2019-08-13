@@ -4,8 +4,8 @@ import org.adoptopenjdk.jheappo.objects.BasicDataTypes;
 
 
 public class BasicDataTypeValue {
-    Object value;
-    BasicDataTypes type;
+    private Object value;
+    private BasicDataTypes type;
 
     public BasicDataTypeValue(BasicDataTypes type) {
         this.type = type;

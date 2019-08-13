@@ -53,7 +53,7 @@ public class JavaHeap {
                 } else if (frame instanceof UTF8StringSegment) {
                     var string = ((UTF8StringSegment) frame).toUtf8String();
                     stringTable.put(string.getId(), string);
-                    out.write(Long.toString(string.getId()) + "->" + string.getString() + "\n");
+                    out.write(string.getId() + "->" + string.getString() + "\n");
                 } else if (frame instanceof LoadClass) {
                     loadClassTable.put(((LoadClass) frame).getClassObjectID(), (LoadClass) frame); //store mapping of class to class name.
                     out.write(frame.toString() + "\n");

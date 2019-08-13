@@ -108,9 +108,9 @@ public class HeapGraph {
                             for (int i = 0; i < classObject.fieldNameIndicies().length; i++) {
                                 long index = classObject.fieldNameIndicies()[i];
                                 BasicDataTypeValue type = instanceObject.instanceFieldValues()[i];
-                                switch (type.type) {
+                                switch (type.getType()) {
                                     case OBJECT:
-                                        Node other = mergeNode(db, instanceNodes, Labels.Instance, (Long) type.value);
+                                        Node other = mergeNode(db, instanceNodes, Labels.Instance, (Long) type.getValue());
                                         count++;
                                         Relationship rel = node.createRelationshipTo(other, Relationships.CONTAINS);
                                         count++;
@@ -124,7 +124,7 @@ public class HeapGraph {
                                     case SHORT:
                                     case INT:
                                     case LONG:
-                                        node.setProperty(fieldName(index), type.value); // todo type + value
+                                        node.setProperty(fieldName(index), type.getValue()); // todo type + value
                                         break;
                                     case ARRAY:
                                         break;

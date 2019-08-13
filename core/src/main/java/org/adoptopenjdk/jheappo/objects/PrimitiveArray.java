@@ -18,7 +18,7 @@ public class PrimitiveArray extends HeapObject {
     private int size;
     private byte elementType;
     private char signature = ' ';
-    BasicDataTypeValue[] elements;
+    private BasicDataTypeValue[] elements;
 
     public PrimitiveArray(EncodedChunk buffer) {
         super(buffer);

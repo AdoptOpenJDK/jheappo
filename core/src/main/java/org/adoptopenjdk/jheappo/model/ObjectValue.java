@@ -13,6 +13,7 @@ public class ObjectValue extends BasicDataTypeValue {
 
     @Override
     public String toString() {
-        return String.format("%d of type %s", objectId, type);
+
+        return String.format("%d of type %s", objectId, getType());
     }
 }

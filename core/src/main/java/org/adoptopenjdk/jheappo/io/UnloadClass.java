@@ -8,7 +8,7 @@ public class UnloadClass extends HeapProfileRecord {
         u4   |  class serial number (always > 0)
      */
 
-    long classSerialNumber;
+    private long classSerialNumber;
 
     public UnloadClass(EncodedChunk body) {
         classSerialNumber = body.extractU4();

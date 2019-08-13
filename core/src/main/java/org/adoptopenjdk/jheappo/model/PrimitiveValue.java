@@ -14,6 +14,6 @@ public abstract class PrimitiveValue<T> extends BasicDataTypeValue {
     @Override
     public String toString() {
 
-        return String.format("%s of type %s", value, type);
+        return String.format("%s of type %s", value, getType());
     }
 }

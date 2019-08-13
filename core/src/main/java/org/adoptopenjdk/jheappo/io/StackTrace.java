@@ -20,10 +20,10 @@ public class StackTrace extends HeapProfileRecord {
         [ID]* | series of stack frame ID's
      */
 
-    int stackTraceSerialNumber;
-    int threadSerialNumber;
-    int numberOfFrames;
-    long[] stackFrameIDs;
+    private int stackTraceSerialNumber;
+    private int threadSerialNumber;
+    private int numberOfFrames;
+    private long[] stackFrameIDs;
 
     public StackTrace(EncodedChunk body) {
         stackTraceSerialNumber = body.extractU4();
@@ -36,6 +36,7 @@ public class StackTrace extends HeapProfileRecord {
     }
 
     public String toString() {
+
         return "StackTrace --> " + stackTraceSerialNumber + ":" + threadSerialNumber + ":" + numberOfFrames;
     }
 }

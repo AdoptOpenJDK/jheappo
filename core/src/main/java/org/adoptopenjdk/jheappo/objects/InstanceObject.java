@@ -21,10 +21,10 @@ public class InstanceObject extends HeapObject {
 
     public final static int TAG = 0x21;
 
-    int stackTraceSerialNumber;
-    long classObjectID;
-    BasicDataTypeValue[] instanceFieldValues = new BasicDataTypeValue[0];
-    EncodedChunk buffer;
+    private int stackTraceSerialNumber;
+    private long classObjectID;
+    private BasicDataTypeValue[] instanceFieldValues = new BasicDataTypeValue[0];
+    private EncodedChunk buffer;
 
     public InstanceObject(EncodedChunk buffer) {
         super(buffer);

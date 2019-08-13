@@ -47,19 +47,19 @@ public class ClassObject extends HeapObject {
 
     public static final int TAG = 0x20;
 
-    long superClassObjectID;
-    long classLoaderObjectID;
-    int stackTraceSerialNumber;
-    long signersObjectID;
-    long protectionDomainObjectID;
-    long[] reserved = new long[2];
-    int instanceSizeInBytes;
+    private long superClassObjectID;
+    private long classLoaderObjectID;
+    private int stackTraceSerialNumber;
+    private long signersObjectID;
+    private long protectionDomainObjectID;
+    private long[] reserved = new long[2];
+    private int instanceSizeInBytes;
 
-    long[] staticFieldNameIndicies;
-    BasicDataTypeValue[] staticValues;
+    private long[] staticFieldNameIndicies;
+    private BasicDataTypeValue[] staticValues;
 
-    long[] fieldNamesIndicies;
-    int[] fieldTypes;
+    private long[] fieldNamesIndicies;
+    private int[] fieldTypes;
 
     public ClassObject(EncodedChunk buffer) {
         super(buffer); //classObjectID;
